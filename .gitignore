@@ -1,0 +1,11 @@
+# Skill install artifacts — re-materialized from skills-lock.json (which IS tracked), like
+# node_modules. .claude/ also holds personal settings.local.json.
+.claude/
+.agents/
+
+# Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
