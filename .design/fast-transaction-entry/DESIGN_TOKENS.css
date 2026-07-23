@@ -1,0 +1,382 @@
+/* =============================================================================
+   life-tracker-web — Design Tokens
+   Phase 4 of /design-flow. Derived from DESIGN_BRIEF.md in this folder.
+
+   Philosophy: DIETER RAMS (Functionalist) — "less but better."
+   Format: CSS custom properties. Chosen for portability because
+   life-tracker-web does not exist yet; there is no Tailwind config or theme
+   provider to extend. Import once at the app root. When the repo is
+   scaffolded this file moves to src/styles/tokens.css.
+
+   Nothing here was eyeballed. Every contrast ratio quoted below was computed
+   against the WCAG 2.1 relative-luminance formula, and the two values that
+   failed on the first pass (placeholder text, control borders) were corrected
+   rather than waved through.
+
+   ---------------------------------------------------------------------------
+   THREE DECISIONS THAT ARE NOT NEGOTIABLE WITHOUT REVISITING THE BRIEF
+   ---------------------------------------------------------------------------
+
+   1. MONEY IS NOT COLOUR-CODED.
+      There is no green-for-income, red-for-spending. Rams holds that colour is
+      information, not decoration — and here the information is already carried
+      losslessly by the sign and the account. Colour-coding would add nothing
+      and would fail the ~8% of men with red-green colour blindness, on the one
+      figure in the app that must never be misread. Direction is carried by the
+      minus sign, the intent wording, and position. --color-money-negative
+      exists only to tint an already-signed negative balance; it is
+      reinforcement and must never be the sole carrier of meaning.
+
+   2. ALL FIGURES ARE MONO AND TABULAR.
+      --font-family-mono on every monetary amount, without exception. Amounts
+      must align on the decimal down a column, and 1200.00 must be instantly
+      distinguishable from 12.00 — that misreading is precisely the risk the
+      brief's undo window exists to catch, so the type should catch it first.
+
+   3. ONE ACCENT, USED SPARINGLY.
+      A single burnt orange (Braun heritage) marks the primary action and
+      focus. It is not a brand colour to be sprinkled. If two things on screen
+      are accent-coloured, one of them is wrong.
+   ============================================================================= */
+
+:root {
+  /* ---------------------------------------------------------------------------
+     COLOR — LIGHT
+     Warm neutral greys, not blue-greys: the light surface should read as paper,
+     not as screen. Contrast ratios in comments are against the WORST-CASE
+     background of the three (--color-bg-tertiary), so each holds everywhere.
+     --------------------------------------------------------------------------- */
+
+  --color-bg-primary: #FAFAF9;         /* app canvas — warm off-white */
+  --color-bg-secondary: #FFFFFF;       /* raised surfaces: the entry form, rows */
+  --color-bg-tertiary: #F1F0ED;        /* wells: inputs, the amount field */
+  --color-bg-inverse: #1C1B19;
+
+  --color-text-primary: #1C1B19;       /* 15.10:1 — warm near-black, never #000 */
+  --color-text-secondary: #5A5751;     /*  6.32:1 */
+  --color-text-tertiary: #6F6B64;      /*  4.65:1 — placeholders. Deliberately
+                                              darker than a conventional "muted"
+                                              grey: placeholder text is NOT
+                                              contrast-exempt under WCAG, and the
+                                              first candidate (#8B8781) failed at
+                                              3.13:1. */
+  --color-text-inverse: #FAFAF9;
+  --color-text-link: #175CD3;          /*  5.25:1 */
+
+  --color-border-subtle: #E7E5E1;      /* decorative dividers only — exempt from
+                                              1.4.11, and intentionally faint.
+                                              Rams: borders over shadows. */
+  --color-border-primary: #D5D2CC;     /* resting edge of non-interactive surfaces */
+  --color-border-strong: #8E8981;      /*  3.05:1 — REQUIRED on every interactive
+                                              control boundary (inputs, selects,
+                                              buttons). WCAG 1.4.11 non-text
+                                              contrast. Do not substitute
+                                              --color-border-primary here; it
+                                              measures 1.32:1 and fails. */
+  --color-border-focus: #C2410C;       /*  4.96:1 against the canvas */
+
+  --color-accent-primary: #C2410C;     /*  4.54:1 as text; 5.18:1 for white text
+                                              ON this as a fill */
+  --color-accent-primary-hover: #9A330A;
+  --color-accent-primary-active: #7C2A08;
+  --color-accent-secondary: #5A5751;   /* secondary actions are neutral, not a
+                                              second hue */
+
+  --color-status-success: #2E6B3E;     /*  5.60:1 */
+  --color-status-warning: #B54708;     /*  4.76:1 */
+  --color-status-error: #B42318;       /*  5.77:1 */
+  --color-status-info: #175CD3;        /*  5.25:1 */
+
+  --color-money-negative: #8C2F17;     /*  7.27:1 — tint for negative balances.
+                                              REINFORCEMENT ONLY. See decision 1. */
+
+  --color-surface-overlay: rgb(28 27 25 / 0.32);
+
+  /* ---------------------------------------------------------------------------
+     TYPOGRAPHY
+     IBM Plex: a functional grotesque with a true monospace sibling and proper
+     tabular figures. Not a default (the brief's philosophy forbids Inter,
+     Roboto, system stacks) and not a fashion choice — the pairing exists so
+     that prose and money can share a voice while money keeps its column.
+     --------------------------------------------------------------------------- */
+
+  --font-family-display: 'IBM Plex Sans', ui-sans-serif, sans-serif;
+  --font-family-body: 'IBM Plex Sans', ui-sans-serif, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Apply to EVERY monetary figure. Without this, proportional digits break
+     decimal alignment and the column stops being scannable. */
+  --font-feature-numeric: 'tnum' 1, 'zero' 1;
+
+  /* One scale, used strictly — Rams. 1.200 minor third from a 16px base.
+     Restrained on purpose: a tool this small does not need nine heading sizes. */
+  --font-size-xs: 0.694rem;    /* 11.1px — metadata, legal */
+  --font-size-sm: 0.833rem;    /* 13.3px — labels, captions */
+  --font-size-base: 1rem;      /* 16px   — body, inputs. Never smaller on mobile:
+                                          iOS zooms any input below 16px. */
+  --font-size-md: 1.2rem;      /* 19.2px — emphasised body */
+  --font-size-lg: 1.44rem;     /* 23px   — section headings */
+  --font-size-xl: 1.728rem;    /* 27.6px — page headings */
+  --font-size-2xl: 2.074rem;   /* 33.2px — account balances */
+  --font-size-3xl: 2.488rem;   /* 39.8px */
+  --font-size-4xl: 2.986rem;   /* 47.8px — the amount field, and nothing else.
+                                          It is the largest thing in the app
+                                          because it is the most important. */
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.15;   /* headings, and the amount field */
+  --line-height-normal: 1.5;   /* body, form fields */
+  --line-height-relaxed: 1.7;  /* the rare paragraph of explanatory prose */
+
+  --letter-spacing-tight: -0.02em;   /* large display sizes only */
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.06em;     /* small all-caps field labels */
+
+  /* ---------------------------------------------------------------------------
+     SPACING — 4px base, mathematical, no arbitrary values anywhere
+     --------------------------------------------------------------------------- */
+
+  --space-0: 0;
+  --space-1: 0.25rem;   /*  4px */
+  --space-2: 0.5rem;    /*  8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px — the default gap */
+  --space-5: 1.5rem;    /* 24px */
+  --space-6: 2rem;      /* 32px */
+  --space-7: 3rem;      /* 48px */
+  --space-8: 4rem;      /* 64px */
+  --space-9: 6rem;      /* 96px */
+  --space-10: 8rem;     /* 128px */
+  --space-11: 12rem;    /* 192px */
+  --space-12: 16rem;    /* 256px */
+
+  /* Minimum interactive target. The entry form is used one-handed, at a till. */
+  --size-touch-target: 2.75rem;  /* 44px */
+
+  /* ---------------------------------------------------------------------------
+     LAYOUT
+     Radii are near-absent by design: Rams uses rounding sparingly and
+     consistently. Two values, and a pill reserved for genuinely pill-shaped
+     things (the intent segmented control).
+     --------------------------------------------------------------------------- */
+
+  --max-width-content: 42rem;   /* ~66ch */
+  --max-width-wide: 60rem;
+  --max-width-page: 80rem;
+  --max-width-form: 28rem;      /* the entry form's ceiling on desktop */
+
+  --border-radius-sm: 2px;
+  --border-radius-md: 4px;
+  --border-radius-lg: 6px;
+  --border-radius-full: 9999px;
+
+  --border-width-thin: 1px;
+  --border-width-thick: 2px;    /* focus ring, and the active segment */
+
+  /* Shadows are a last resort — Rams prefers a border. These exist only for
+     genuinely floating things: the undo toast and the label dropdown. */
+  --shadow-sm: 0 1px 2px rgb(28 27 25 / 0.05);
+  --shadow-md: 0 2px 8px rgb(28 27 25 / 0.08);
+  --shadow-lg: 0 8px 24px rgb(28 27 25 / 0.12);
+  --shadow-focus: 0 0 0 3px rgb(194 65 12 / 0.28);
+
+  /* ---------------------------------------------------------------------------
+     MOTION
+     Minimal and purposeful. State changes and reveals only; nothing decorative.
+     --------------------------------------------------------------------------- */
+
+  --duration-instant: 50ms;
+  --duration-fast: 150ms;      /* hover, focus, press */
+  --duration-normal: 250ms;    /* field reveal — the label picker appearing */
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  /* No bounce token. Overshoot is decorative motion, which this philosophy
+     excludes, and it is actively wrong on a financial confirmation. */
+
+  /* The undo window from the brief. A real product parameter, not styling:
+     it is how long a mistake stays recallable, and WCAG 2.2.1 requires it be
+     adjustable — expose it in settings and allow it to be disabled. */
+  --duration-undo-window: 5000ms;
+
+  /* ---------------------------------------------------------------------------
+     BREAKPOINTS
+     Reference only — CSS custom properties cannot be used in media queries.
+     Mirror these in the build config; do not let the two drift.
+     --------------------------------------------------------------------------- */
+
+  --breakpoint-sm: 375px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;   /* entry becomes a side-by-side panel here */
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* ---------------------------------------------------------------------------
+     COMPONENT-LEVEL TOKENS
+     --------------------------------------------------------------------------- */
+
+  --amount-field-font-size: var(--font-size-4xl);
+  --amount-field-font-family: var(--font-family-mono);
+
+  --intent-selector-height: var(--size-touch-target);
+  --intent-selector-radius: var(--border-radius-full);
+
+  --field-height: var(--size-touch-target);
+  --field-bg: var(--color-bg-tertiary);
+  --field-border: var(--border-width-thin) solid var(--color-border-strong);
+  --field-border-focus: var(--border-width-thick) solid var(--color-border-focus);
+  --field-radius: var(--border-radius-md);
+
+  --row-padding-y: var(--space-3);
+  --row-border: var(--border-width-thin) solid var(--color-border-subtle);
+
+  --toast-bg: var(--color-bg-inverse);
+  --toast-text: var(--color-text-inverse);
+  --toast-shadow: var(--shadow-lg);
+}
+
+/* =============================================================================
+   DARK MODE
+   Warm near-black, matching the warm off-white of light mode — the two are the
+   same room at different times of day, not inverses of each other. Text is
+   off-white (#E8E6E1), never pure white, and every value below was recomputed
+   rather than derived by flipping lightness.
+   ============================================================================= */
+
+[data-theme='dark'] {
+  --color-bg-primary: #161513;
+  --color-bg-secondary: #1F1E1B;
+  --color-bg-tertiary: #292824;
+  --color-bg-inverse: #E8E6E1;
+
+  --color-text-primary: #E8E6E1;       /* 11.83:1 on worst-case bg */
+  --color-text-secondary: #A8A49C;     /*  5.94:1 */
+  --color-text-tertiary: #96918A;      /*  4.72:1 — again lifted from the
+                                              obvious choice (#7A766E, 3.26:1)
+                                              to keep placeholders legible */
+  --color-text-inverse: #1C1B19;
+  --color-text-link: #84ADFF;          /*  6.61:1 */
+
+  --color-border-subtle: #2B2A26;
+  --color-border-primary: #3A3833;
+  --color-border-strong: #7C776C;      /*  3.31:1 — interactive boundaries */
+  --color-border-focus: #F97316;       /*  6.51:1 against the canvas */
+
+  --color-accent-primary: #F97316;     /* lifted from the light value; #C2410C
+                                              is unreadable on near-black */
+  --color-accent-primary-hover: #FB923C;
+  --color-accent-primary-active: #EA580C;
+  --color-accent-secondary: #A8A49C;
+
+  --color-status-success: #75C48A;     /*  7.04:1 */
+  --color-status-warning: #F79009;     /*  6.29:1 */
+  --color-status-error: #F97066;       /*  5.30:1 */
+  --color-status-info: #84ADFF;        /*  6.61:1 */
+
+  --color-money-negative: #E88B7A;     /*  5.91:1 */
+
+  --color-surface-overlay: rgb(0 0 0 / 0.6);
+
+  /* Darker and more transparent than light mode, not the same values. A light
+     shadow over a dark surface reads as haze. */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 2px 8px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.5);
+  --shadow-focus: 0 0 0 3px rgb(249 115 22 / 0.32);
+}
+
+/* System preference, unless the user has explicitly chosen light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg-primary: #161513;
+    --color-bg-secondary: #1F1E1B;
+    --color-bg-tertiary: #292824;
+    --color-bg-inverse: #E8E6E1;
+
+    --color-text-primary: #E8E6E1;
+    --color-text-secondary: #A8A49C;
+    --color-text-tertiary: #96918A;
+    --color-text-inverse: #1C1B19;
+    --color-text-link: #84ADFF;
+
+    --color-border-subtle: #2B2A26;
+    --color-border-primary: #3A3833;
+    --color-border-strong: #7C776C;
+    --color-border-focus: #F97316;
+
+    --color-accent-primary: #F97316;
+    --color-accent-primary-hover: #FB923C;
+    --color-accent-primary-active: #EA580C;
+    --color-accent-secondary: #A8A49C;
+
+    --color-status-success: #75C48A;
+    --color-status-warning: #F79009;
+    --color-status-error: #F97066;
+    --color-status-info: #84ADFF;
+
+    --color-money-negative: #E88B7A;
+
+    --color-surface-overlay: rgb(0 0 0 / 0.6);
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+    --shadow-md: 0 2px 8px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.5);
+    --shadow-focus: 0 0 0 3px rgb(249 115 22 / 0.32);
+  }
+}
+
+/* =============================================================================
+   BASE APPLICATION
+   ============================================================================= */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every monetary figure in the app. Apply by class, never ad hoc — this rule
+   is what makes a column of amounts align on the decimal. */
+.money {
+  font-family: var(--font-family-mono);
+  font-feature-settings: var(--font-feature-numeric);
+  font-variant-numeric: tabular-nums;
+}
+
+.money--negative { color: var(--color-money-negative); }
+
+/* Visible focus everywhere. Never remove without an equivalent replacement —
+   the entry form is keyboard-first, so this is the primary wayfinding. */
+:focus-visible {
+  outline: var(--border-width-thick) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* NOTE: --duration-undo-window is a product timeout, not an animation, and
+     is deliberately NOT collapsed here. Shortening it would remove the user's
+     window to cancel. Only its visual countdown stops animating. */
+}
