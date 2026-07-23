@@ -3,6 +3,21 @@
 .claude/
 .agents/
 
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo
+
+# The generated API client. Regenerated from ../life-tracker-contracts/openapi.yaml on every
+# dev, build and typecheck. Ignored ON PURPOSE: a committed copy is a copy that can be edited,
+# and an edited generated client is the exact failure the contract rule exists to prevent.
+src/api/generated/
+
+# Local environment. .env.example IS tracked.
+.env
+.env.local
+.env.*.local
+
 # Editors
 .vscode/
 .idea/

@@ -24,7 +24,7 @@ this repo.
 
 ## Foundation
 
-- [ ] **Sign-in screen, end to end**: Scaffold Vite + React + TypeScript in `life-tracker-web/`,
+- [x] **Sign-in screen, end to end**: Scaffold Vite + React + TypeScript in `life-tracker-web/`,
       wire OpenAPI codegen against `../life-tracker-contracts/openapi.yaml` with the generated
       output git-ignored, import `DESIGN_TOKENS.css`, load IBM Plex Sans + Mono, and build
       `/login` calling the **generated** `login` operation against a running backend. Done when a
@@ -33,12 +33,50 @@ this repo.
       token file, and the aesthetic in one slice._ Establishes the **Dieter Rams** direction —
       restrained neutrals, single burnt-orange accent, borders over shadows.
 
-- [ ] **`MoneyText` and the money-string discipline**: A component that renders a
+      > **Done, with one part of the acceptance test outstanding.** Codegen runs against the
+      > sibling spec on every `dev`/`build`/`typecheck`; the SDK's `login` is called with
+      > generated types throughout; tokens and both IBM Plex faces load; typecheck, lint and
+      > build are clean. Every branch of the screen was driven in a real browser — success,
+      > 401, 429 with `Retry-After`, a 502 with no `Problem` body, and empty-field validation —
+      > but against **stubbed** responses, because live backend verification was deferred. The
+      > half still owed is exactly: point it at a running backend and confirm a real credential
+      > returns a real token. Nothing else in the task is waiting on that.
+      >
+      > Two things found by building it, both fixed: `runtimeConfigPath` is written into the
+      > generated import verbatim, so it must be relative to the output directory, not the
+      > config file; and giving the form controls the `disabled` attribute during submit threw
+      > focus to `<body>` on every failed sign-in. The second is why the button uses
+      > `aria-disabled` and a guard in the handler instead.
+
+- [x] **`MoneyText` and the money-string discipline**: A component that renders a
       `{ amount, currency }` pair verbatim in mono with tabular numerals, plus the input
       counterpart that keeps a decimal **string** in state from keystroke to request body. Add a
       test asserting `"1200.00"` survives a round trip unchanged, and a lint rule banning
       `parseFloat`/`Number()` on any wire value. Done when no code path can turn an amount into a
       JavaScript number. _New. Depends on: sign-in screen (for the generated types)._
+
+      > **Done.** Everything money-shaped lives in `src/money/`: `amount.ts` (the string logic),
+      > `MoneyText`, `AmountInput`. Vitest added; 70 tests pass. The round-trip test covers nine
+      > amounts a double destroys, not just `"1200.00"` — trailing zeros, 4-decimal amounts, and
+      > one past `MAX_SAFE_INTEGER` — and a companion test asserts those amounts really are
+      > destroyed by a float, so the suite cannot quietly stop proving anything. Mutation-checked:
+      > rendering through a number fails 7 tests, sanitizing through a float fails 12.
+      >
+      > **The lint rule is weaker than this task assumed, and the gap is worth knowing.** oxlint
+      > has no `no-restricted-syntax`, so `no-restricted-globals` on `parseFloat`/`parseInt`/
+      > `Number` is the strongest available — it does catch `Number(x)`, `Number.parseFloat` and
+      > `Number.parseInt`, but it CANNOT catch unary `+value` or `value * 1`. Lint alone
+      > therefore cannot deliver "no code path can turn an amount into a number". Two further
+      > layers close it: `toMoney()` is the only way this app builds a `Money` and validates the
+      > string against the spec's grammar (rejecting `"1e-7"`, `"NaN"` and
+      > `"0.30000000000000004"` — what a float looks like on the way out), and every numeric
+      > conversion anywhere in the repo now needs a written justification, because the ban is
+      > repo-wide. There is exactly one such disable today, for `Retry-After` in
+      > `src/api/problem.ts`, which is a count of seconds rather than money.
+      >
+      > `AmountInput` is `type="text"` with `inputMode="decimal"`, deliberately: `type="number"`
+      > exposes `valueAsNumber`, which is the hazard itself. It is at base size here; Task 4
+      > scales it to `--amount-field-font-size`.
 
 - [ ] **App shell and the redirect guard**: `AppShell` (top bar, two nav destinations, account
       menu), `AuthLayout`, routing for all nine routes, and the three-step guard from the IA — no
@@ -162,6 +200,15 @@ this repo.
    `LABEL_DEPTH_EXCEEDED`, `LABEL_CYCLE`, `LABEL_IN_USE`, `LABEL_HAS_CHILDREN`, `LABEL_ARCHIVED`,
    `LABEL_NOT_APPLICABLE`, `POSTING_NOT_FOUND`, `MALFORMED_REQUEST`. Fix in the spec, never in the
    consumer.
+
+   _Corrected after running codegen in Task 1._ The omission is real — those codes appear in the
+   spec's own response descriptions — but the consequence stated here was wrong. `Problem.code`
+   carries **no `enum` at all**, just a prose list inside its `description`, so it generates as
+   `code?: string`. There is no incomplete union and nothing fails to compile; the cost is that
+   there is no compiler help either, and an unhandled code passes through silently. `Problem` is
+   therefore normalized once, in `src/api/problem.ts`, which treats an unrecognised or absent
+   code as an expected state rather than an edge case. Adding the `enum` to the spec would turn
+   this into a checked switch and is still worth doing.
 3. **`GET /transactions` has no pagination** — the whole history returns every call. Virtualizing
    the list is a client-side mitigation, not a fix.
 4. **Refresh tokens in JS-reachable storage** — the spec's own pre-production note says browser

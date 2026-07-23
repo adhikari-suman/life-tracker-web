@@ -1,0 +1,134 @@
+/* AuthLayout, in effect — the single centred column the IA specifies for the five
+   unauthenticated routes. It lives here until Task 3 lifts it into a shared layout alongside
+   /register and the password-reset pair; there is nothing to share it with yet. */
+
+.screen {
+  /* dvh, not vh: on mobile Safari and Chrome, 100vh is the viewport with the toolbars hidden,
+     so a form sized to it is cut off by the toolbar that is actually on screen. */
+  min-height: 100dvh;
+  display: grid;
+  /* Mobile: sit near the top. Centring puts the form under the keyboard the moment a field
+     takes focus, which on the 375px target is most of the session. */
+  align-content: start;
+  padding: var(--space-7) var(--space-5) var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .screen {
+    /* Enough height that the keyboard is no longer the constraint, so optical centring wins. */
+    align-content: center;
+    padding: var(--space-7) var(--space-5);
+  }
+}
+
+.panel {
+  width: 100%;
+  max-width: var(--max-width-form);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* --- masthead ---------------------------------------------------------------------------- */
+
+.masthead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.wordmark {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  /* Tight tracking on display sizes only — the tokens reserve this for exactly that. */
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.tagline {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* A rule, not a shadow and not a card edge. Rams uses a line to separate; the masthead and the
+   form are two things, and one hairline is the whole of what is needed to say so. */
+.rule {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* --- form -------------------------------------------------------------------------------- */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.submit {
+  min-height: var(--size-touch-target);
+  padding: var(--space-2) var(--space-5);
+
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--border-radius-md);
+
+  /* The single accent, on the single primary action. If anything else on this screen were
+     accent-coloured, one of the two would be wrong. */
+  background: var(--color-accent-primary);
+  /* Flips with the theme — off-white on burnt orange in light mode, near-black on the lifted
+     orange in dark. Both were contrast-checked in the tokens; one variable covers both. */
+  color: var(--color-text-inverse);
+
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+
+  transition: background-color var(--duration-fast) var(--easing-default);
+}
+
+/* Keyed off aria-disabled rather than :disabled — see the comment on the button. The attribute
+   is the state, so it may as well be the selector. */
+.submit:hover:not([aria-disabled='true']) {
+  background: var(--color-accent-primary-hover);
+}
+
+.submit:active:not([aria-disabled='true']) {
+  background: var(--color-accent-primary-active);
+}
+
+.submit[aria-disabled='true'] {
+  /* Neutral rather than faded: a translucent accent is still the accent, and a half-strength
+     orange reads as a styling accident. Going grey says "not now" without ambiguity. */
+  background: var(--color-accent-secondary);
+  cursor: progress;
+}
+
+/* --- footer ------------------------------------------------------------------------------ */
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  font-size: var(--font-size-sm);
+}
+
+.link {
+  color: var(--color-text-link);
+  text-decoration-thickness: var(--border-width-thin);
+  text-underline-offset: 0.2em;
+}

@@ -1,0 +1,74 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Small, all-caps, widely tracked — the Braun instrument-label convention the tokens set aside
+   --letter-spacing-wide for. text-transform only changes the rendering, so the accessible name
+   a screen reader announces stays in normal case. */
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  /* 44px. The entry form is used one-handed at a till, and this sets the rhythm every other
+     control in the app follows. */
+  min-height: var(--field-height);
+  padding: 0 var(--space-3);
+
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-bg);
+  color: var(--color-text-primary);
+
+  font-family: var(--font-family-body);
+  /* 16px, never less: iOS zooms the whole page on focus for anything smaller. */
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+
+  transition: border-color var(--duration-fast) var(--easing-default);
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Chrome paints autofilled fields with its own pale-yellow fill, which lands as the one
+   un-designed surface on the screen and, in dark mode, as unreadable dark-on-pale. There is no
+   property to switch it off; an inset shadow large enough to cover the field is the standard
+   way to overpaint it. Sign-in is where autofill happens, so this is not a hypothetical. */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text-primary);
+  -webkit-box-shadow: 0 0 0 100px var(--field-bg) inset;
+  caret-color: var(--color-text-primary);
+}
+
+/* The global :focus-visible rule in tokens.css draws the ring. This darkens the border to match
+   it, so the field itself reads as active and not merely encircled. */
+.input:focus-visible {
+  border-color: var(--color-border-focus);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-status-error);
+}
+
+.input:disabled {
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
+}
+
+/* Paired with the field's aria-describedby, so this text is announced as part of the field
+   rather than as loose prose after it. The wording carries the failure; the colour only
+   reinforces it. */
+.error {
+  font-size: var(--font-size-sm);
+  color: var(--color-status-error);
+}

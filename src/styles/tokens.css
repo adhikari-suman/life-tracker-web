@@ -3,10 +3,14 @@
    Phase 4 of /design-flow. Derived from DESIGN_BRIEF.md in this folder.
 
    Philosophy: DIETER RAMS (Functionalist) — "less but better."
-   Format: CSS custom properties. Chosen for portability because
-   life-tracker-web does not exist yet; there is no Tailwind config or theme
-   provider to extend. Import once at the app root. When the repo is
-   scaffolded this file moves to src/styles/tokens.css.
+   Format: CSS custom properties. Chosen for portability: there is no Tailwind
+   config or theme provider to extend, and none is wanted. Imported once, at
+   the app root (src/main.tsx).
+
+   This file WAS .design/fast-transaction-entry/DESIGN_TOKENS.css and moved
+   here when the repo was scaffolded, as its original header prescribed. It is
+   now code, not a design artifact, and there is deliberately no second copy
+   under .design/ to drift from it.
 
    Nothing here was eyeballed. Every contrast ratio quoted below was computed
    against the WCAG 2.1 relative-luminance formula, and the two values that
@@ -91,6 +95,12 @@
                                               REINFORCEMENT ONLY. See decision 1. */
 
   --color-surface-overlay: rgb(28 27 25 / 0.32);
+
+  /* Text selection. The browser default is a saturated blue that belongs to no palette here,
+     and it is not a rare sight: a rejected sign-in selects the password so the retry is one
+     gesture, so the selected state is deliberately put on screen. A wash of the accent at low
+     alpha keeps the text at full contrast underneath. */
+  --color-selection: rgb(194 65 12 / 0.20);
 
   /* ---------------------------------------------------------------------------
      TYPOGRAPHY
@@ -284,6 +294,10 @@
 
   --color-surface-overlay: rgb(0 0 0 / 0.6);
 
+  /* The lifted accent, and a touch more alpha — the same 0.20 wash disappears against a
+     near-black field. */
+  --color-selection: rgb(249 115 22 / 0.30);
+
   /* Darker and more transparent than light mode, not the same values. A light
      shadow over a dark surface reads as haze. */
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
@@ -324,6 +338,7 @@
     --color-money-negative: #E88B7A;
 
     --color-surface-overlay: rgb(0 0 0 / 0.6);
+    --color-selection: rgb(249 115 22 / 0.30);
 
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
     --shadow-md: 0 2px 8px rgb(0 0 0 / 0.4);
@@ -348,6 +363,30 @@ body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Keeping the text colour explicit matters: browsers override the foreground as well as the
+   background when selecting, and letting them pick would undo the contrast work above on the
+   one string the user is looking straight at. */
+::selection {
+  background: var(--color-selection);
+  color: var(--color-text-primary);
+}
+
+/* Available to assistive technology, absent from the page. Used where a figure needs a
+   qualifier that the layout already supplies visually — a currency code sitting in a column
+   header, say, which a screen reader has no way to associate with the row it is reading.
+   Not `display: none`, which would remove it from the accessibility tree as well. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Every monetary figure in the app. Apply by class, never ad hoc — this rule

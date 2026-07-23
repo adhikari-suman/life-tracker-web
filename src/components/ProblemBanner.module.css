@@ -1,0 +1,38 @@
+/* A bordered block, not a floating pill: Rams prefers a border to a shadow, and an error that
+   overlays content is an error that hides the field it is about. It sits in the flow, above the
+   form, and pushes it down. */
+
+.banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-thin) solid var(--color-border-primary);
+
+  /* The one piece of colour. A rule down the leading edge rather than a tinted fill: the
+     message stays on the same paper as everything else, so its text keeps full contrast
+     instead of sitting on a wash that was never contrast-checked. */
+  border-inline-start: var(--border-width-thick) solid var(--color-status-error);
+  border-radius: var(--border-radius-md);
+  background: var(--color-bg-secondary);
+}
+
+/* Colour is never the only signal — WCAG 1.4.1, and the brief is explicit about it. This word
+   carries the meaning on its own, so the banner still reads as an error in greyscale, in a
+   screen reader, and for the ~8% of men with red-green colour blindness. */
+.marker {
+  flex: none;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-status-error);
+}
+
+.message {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}

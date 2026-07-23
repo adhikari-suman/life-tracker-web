@@ -1,0 +1,88 @@
+/* Base size. Task 4 scales this to --amount-field-font-size (--font-size-4xl) for the entry
+   form, where the amount is the largest thing in the app; the semantics and the string handling
+   are identical at both sizes and live in the component, not here. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* The border lives on the wrapper rather than the input, so the currency adornment sits inside
+   the field's edge instead of beside it. */
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  min-height: var(--field-height);
+  padding: 0 var(--space-3);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-bg);
+
+  transition: border-color var(--duration-fast) var(--easing-default);
+}
+
+/* Focus is on the input but must be drawn around the whole field. `:has` moves it out to the
+   wrapper; the input's own ring is suppressed below so there is exactly one. Keyed on
+   :focus-visible, not :focus-within, so clicking does not raise a keyboard-navigation ring. */
+.wrapper:has(.input:focus-visible) {
+  border-color: var(--color-border-focus);
+  outline: var(--border-width-thick) solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.wrapper:has(.input[aria-invalid='true']) {
+  border-color: var(--color-status-error);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+
+  /* Mono with tabular figures, matching MoneyText. What is typed and what is later read back
+     sit on the same grid, so a figure does not appear to shift when it is committed. */
+  font-family: var(--font-family-mono);
+  font-feature-settings: var(--font-feature-numeric);
+  font-variant-numeric: tabular-nums;
+  /* 16px floor: iOS zooms the page on focus for anything smaller, and this field is used
+     one-handed on a phone. */
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+}
+
+.input:focus-visible {
+  /* Drawn on .wrapper instead — see above. */
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Matches MoneyText's treatment: the code is subordinate to the figure in both places, so an
+   amount looks the same whether it is being typed or being read. */
+.currency {
+  flex: none;
+  font-family: var(--font-family-mono);
+  font-size: 0.85em;
+  color: var(--color-text-secondary);
+}
+
+.error {
+  font-size: var(--font-size-sm);
+  color: var(--color-status-error);
+}

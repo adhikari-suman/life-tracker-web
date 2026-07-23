@@ -1,0 +1,17 @@
+/* The mono face, tabular figures and the negative tint all come from the global `.money` and
+   `.money--negative` rules in tokens.css, which the tokens file requires be applied by class
+   rather than restated here. What is left is only what those rules do not cover. */
+
+.money {
+  /* An amount and its currency are one token. Breaking between them leaves a bare figure at the
+     end of a line with its qualifier on the next, which is the ledger equivalent of a dangling
+     preposition — and worse, momentarily reads as a different currency. */
+  white-space: nowrap;
+}
+
+.currency {
+  /* Subordinate to the figure, because the figure is the information and the code qualifies it.
+     Still --color-text-secondary at 6.32:1, so it is quieter without being decorative-grey. */
+  color: var(--color-text-secondary);
+  font-size: 0.85em;
+}
