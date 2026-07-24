@@ -33,14 +33,27 @@ this repo.
       token file, and the aesthetic in one slice._ Establishes the **Dieter Rams** direction —
       restrained neutrals, single burnt-orange accent, borders over shadows.
 
-      > **Done, with one part of the acceptance test outstanding.** Codegen runs against the
-      > sibling spec on every `dev`/`build`/`typecheck`; the SDK's `login` is called with
-      > generated types throughout; tokens and both IBM Plex faces load; typecheck, lint and
-      > build are clean. Every branch of the screen was driven in a real browser — success,
-      > 401, 429 with `Retry-After`, a 502 with no `Problem` body, and empty-field validation —
-      > but against **stubbed** responses, because live backend verification was deferred. The
-      > half still owed is exactly: point it at a running backend and confirm a real credential
-      > returns a real token. Nothing else in the task is waiting on that.
+      > **Done, and verified against a live backend.** Codegen runs against the sibling spec on
+      > every `dev`/`build`/`typecheck`; the SDK's `login` is called with generated types
+      > throughout; tokens and both IBM Plex faces load; typecheck, lint and build are clean.
+      >
+      > The acceptance test was run for real against `life-tracker-backend`'s compose stack
+      > (`docker compose --profile full up -d --build`), with no stubs anywhere: a registered
+      > credential returns HTTP 200 and stores a genuine three-part RS256 JWT whose `iss` is
+      > `http://localhost:8080/v1`, and a wrong password returns the backend's real RFC 7807
+      > body, which renders as "Email or password is incorrect." — designed copy switched on
+      > `Problem.code`, never the server's `detail` prose. Nine browser checks, all passing,
+      > including that the copy does not leak whether an email is registered and that focus
+      > lands on the password field for the retry. The earlier stubbed runs covering 429 with
+      > `Retry-After`, a proxy 502 with no `Problem` body, and empty-field validation still
+      > stand.
+      >
+      > **The dev-server proxy turns out to be required, not a convenience.** The backend has no
+      > CORS configuration at all, so a browser calling `http://localhost:8080/v1` directly from
+      > the dev origin fails at preflight. `VITE_API_BASE_URL` must stay unset in development so
+      > calls go to `/v1` same-origin and are proxied. The proxy passes `/v1` through unrewritten
+      > because it is the backend's own `server.servlet.context-path` (ADR-0017), not a prefix a
+      > gateway strips.
       >
       > Two things found by building it, both fixed: `runtimeConfigPath` is written into the
       > generated import verbatim, so it must be relative to the output directory, not the
@@ -214,3 +227,21 @@ this repo.
 4. **Refresh tokens in JS-reachable storage** — the spec's own pre-production note says browser
    refresh delivery must move to an httpOnly cookie before the web client faces real users, and is
    explicit: *do not ship web without it*. Not a blocker for building; a hard blocker for shipping.
+5. **The backend returns a `Problem` field the spec does not declare.** _Found by running the live
+   stack in Task 1._ Every error body carries `instance` — e.g.
+   `{"detail":"Authentication failed.","instance":"/v1/auth/login","status":401,`
+   `"title":"Unauthorized","code":"UNAUTHORIZED"}` — but `Problem` in `openapi.yaml` declares only
+   `type`, `title`, `status`, `detail` and `code`, and sets `additionalProperties: false`.
+
+   The backend is the one behaving correctly here: `instance` is a standard RFC 7807 member
+   (§3.1), and the spec says `Problem` *is* an RFC 7807 problem detail. So **the spec is wrong,
+   not the backend** — it should declare `instance` rather than forbid it. Harmless today
+   because this client does not validate response bodies, and `instance` is simply invisible in
+   the generated type. It stops being harmless the moment anything validates responses against
+   the schema, or a consumer wants the field. Fix in the spec.
+
+6. **The backend has no CORS configuration.** No `CorsConfigurationSource`, nothing in
+   `SecurityConfig`. Not a defect — the web client proxies through the dev server and is
+   same-origin, so nothing is needed for development, and a deployment would normally put both
+   behind one origin. Recorded because it is a silent constraint: pointing `VITE_API_BASE_URL`
+   straight at `http://localhost:8080/v1` looks reasonable and fails every request at preflight.

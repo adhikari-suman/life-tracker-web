@@ -13,9 +13,32 @@ npm run dev
 ```
 
 `dev` regenerates the API client before starting, so a spec change in the sibling repo shows up
-as a type error rather than as a runtime surprise. The dev server proxies `/v1` to
-`http://localhost:8080`; set `VITE_BACKEND_ORIGIN` if the backend is elsewhere. See
-`.env.example` — both variables are optional.
+as a type error rather than as a runtime surprise.
+
+## Running it against a real backend
+
+The API comes from `life-tracker-backend`, whose `compose.yaml` offers two modes. Either puts it
+on `localhost:8080`, which is what this app expects by default.
+
+```sh
+cd ../life-tracker-backend
+
+# Everything in containers, including the app.
+docker compose --profile full up -d --build
+
+# Or: dependencies only — Postgres, keypair, migrations — with the app on the host.
+docker compose up -d
+SPRING_PROFILES_ACTIVE=local ./gradlew :infrastructure:bootRun
+```
+
+**The dev-server proxy is required, not a convenience.** The backend has no CORS configuration,
+so a browser calling `http://localhost:8080/v1` directly from this origin fails at preflight.
+Leaving `VITE_API_BASE_URL` unset sends calls to `/v1` on the dev server's own origin, which
+proxies them — same-origin, and nothing to add to the backend.
+
+`/v1` is the backend's own `server.servlet.context-path`, not a prefix a gateway strips, so the
+proxy passes it through unrewritten. Set `VITE_BACKEND_ORIGIN` if the backend is not on 8080.
+See `.env.example`; both variables are optional.
 
 | Script | What |
 |---|---|
