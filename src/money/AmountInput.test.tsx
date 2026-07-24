@@ -105,10 +105,18 @@ describe('keystroke to wire and back', () => {
     // And the figure as it comes back from the server and is rendered in the list. The gap is
     // MoneyText's non-breaking space; see the note in MoneyText.test.tsx for why it is written
     // as an escape and never pasted.
+    //
+    // The drawn figure now carries a thousands separator. That arrived with the reports surface
+    // and is display only — built by string surgery in formatForDisplay, never by a number. It
+    // changes how the figure is DRAWN; it does not change what it is.
     const { container } = render(<MoneyText money={money} />)
-    expect(container.textContent).toBe(['1200.00', 'USD'].join(NBSP))
+    expect(container.textContent).toBe(['1,200.00', 'USD'].join(NBSP))
 
-    // The whole point, stated once: the same characters the user typed, all the way round.
+    // Strip the presentation back off and every character the user typed is still there — which
+    // is the assertion that would break if formatting had ever gone through a double.
+    expect(container.textContent?.replace(/,/g, '')).toBe(['1200.00', 'USD'].join(NBSP))
+
+    // The whole point, stated once: the same characters the user typed reach the wire untouched.
     expect(money.amount).toBe('1200.00')
   })
 })

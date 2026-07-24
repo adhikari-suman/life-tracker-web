@@ -134,6 +134,103 @@ export function addAmounts(a: string, b: string): string {
 }
 
 /**
+ * `a - b`, exactly, for two amounts of the SAME currency. The result may be negative — that is
+ * the point: it is what earns the reports surface its "Kept" figure without a float.
+ */
+export function subtractAmounts(a: string, b: string): string {
+  return fromScaled(toScaled(a) - toScaled(b))
+}
+
+/**
+ * A bar's width as a CSS percentage STRING, for the reports breakdown.
+ *
+ * Returning a string rather than a ratio is what keeps this file's float ban absolute. The
+ * obvious implementation divides two numbers and hands back 0–1, which needs `Number` and would
+ * have introduced the codebase's first lint-disable. It is not needed: BigInt divides exactly,
+ * and CSS wants a string anyway, so the number never has to exist.
+ *
+ * Hundredths of a percent is far finer than a rendered bar can show; the precision is here so the
+ * rounding happens in integer math rather than in the layout engine.
+ */
+export function barWidth(part: string, whole: string): string {
+  const scaledWhole = toScaled(whole)
+  // No comparison to zero of a *number* — this is BigInt, which is exact, so it is safe.
+  if (scaledWhole <= 0n) return '0%'
+
+  const scaledPart = toScaled(part)
+  // A negative row is real: a refund can make a category net negative for a month (see
+  // CONTEXT.md on Refund). It gets no bar. Drawing its magnitude would say "a lot went here",
+  // which is the opposite of what happened, and the signed figure beside it already tells the
+  // truth.
+  if (scaledPart <= 0n) return '0%'
+
+  const hundredths = (scaledPart * 10000n) / scaledWhole
+  // Clamped, so a data anomaly overflows the row rather than the layout.
+  const capped = hundredths > 10000n ? 10000n : hundredths
+  const digits = capped.toString().padStart(3, '0')
+  return `${digits.slice(0, digits.length - 2)}.${digits.slice(digits.length - 2)}%`
+}
+
+// ---------------------------------------------------------------------------
+// DISPLAY FORMATTING
+//
+// Presentation only. Nothing below ever produces a value that goes back on the wire, and nothing
+// below uses Number, parseFloat, toFixed or Intl.NumberFormat — all four take or return a double.
+// The wire string is never mutated; it is read, and a different string is built for the screen.
+// ---------------------------------------------------------------------------
+
+/**
+ * ISO 4217 minor units, listing only the currencies that are not 2. A short exception table
+ * rather than the full standard: the wrong answer here is a display detail, whereas shipping a
+ * 180-row table nobody maintains is a permanent liability.
+ */
+const MINOR_UNITS: Record<string, number> = {
+  BIF: 0, CLP: 0, DJF: 0, GNF: 0, ISK: 0, JPY: 0, KMF: 0, KRW: 0, PYG: 0,
+  RWF: 0, UGX: 0, VND: 0, VUV: 0, XAF: 0, XOF: 0, XPF: 0,
+  BHD: 3, IQD: 3, JOD: 3, KWD: 3, LYD: 3, OMR: 3, TND: 3,
+}
+
+/** Thousands separators, inserted right-to-left. Operates on digits, never on a number. */
+function group(digits: string): string {
+  let out = ''
+  for (let i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 === 0) out += ','
+    out += digits[i]
+  }
+  return out
+}
+
+/**
+ * Render an amount for the screen: grouped thousands, and trailing zeros trimmed to the
+ * currency's minor units.
+ *
+ * The rule that matters is what it will NOT do. It trims **only trailing zeros**, and never below
+ * the minor-unit count — so "12.3400" shows as 12.34, but "12.3456" shows in full. A non-zero
+ * digit is never hidden, because hiding one would be the display layer quietly disagreeing with
+ * the ledger about how much money there is. Truncating or rounding to two places would do exactly
+ * that, and would do it invisibly.
+ *
+ * A malformed amount is returned untouched rather than mangled — MoneyText already warns loudly
+ * about those in development, and a visibly wrong figure beats a plausibly wrong one.
+ */
+export function formatForDisplay(amount: string, currency: string): string {
+  if (!isWireAmount(amount)) return amount
+
+  const negative = amount.startsWith('-')
+  const body = negative ? amount.slice(1) : amount
+  const [intPart, fracPart = ''] = body.split('.')
+
+  const min = MINOR_UNITS[currency] ?? 2
+
+  let frac = fracPart
+  while (frac.length > min && frac.endsWith('0')) frac = frac.slice(0, -1)
+  frac = frac.padEnd(min, '0')
+
+  const sign = negative ? '-' : ''
+  return frac.length > 0 ? `${sign}${group(intPart)}.${frac}` : `${sign}${group(intPart)}`
+}
+
+/**
  * The only way this app builds a `Money`. Validates rather than trusts, and throws rather than
  * returning something malformed, because every caller is handing this to the wire: a bad amount
  * that gets through here is a bad amount in the ledger, and the ledger is append-only.

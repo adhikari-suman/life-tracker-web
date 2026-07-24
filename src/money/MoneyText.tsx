@@ -1,15 +1,21 @@
 import type { Money } from '../api/generated/types.gen'
-import { isNegativeAmount, isWireAmount } from './amount'
+import { formatForDisplay, isNegativeAmount, isWireAmount } from './amount'
 import styles from './MoneyText.module.css'
 
 // The sole authority for putting a figure on screen. Every amount in the app renders through
 // this component, which is what makes a column of them line up on the decimal.
 //
-// It renders the amount string EXACTLY as it arrived. No grouping separators are inserted, no
-// digits are padded or trimmed, and Intl.NumberFormat is not used — it takes a number, so
-// reaching for it would convert the amount to a double on the way to the screen, which is the
-// one thing this app does not do with money. Legibility is the typeface's job instead: mono
-// with tabular figures, which is why "1200.00" cannot be mistaken for "120.00" in a column.
+// Intl.NumberFormat is not used and never will be — it takes a number, so reaching for it would
+// convert the amount to a double on the way to the screen, which is the one thing this app does
+// not do with money. Presentation is built by string surgery in `formatForDisplay` instead:
+// thousands grouped, and trailing zeros trimmed to the currency's minor units, so the four
+// fractional digits the server sends do not become noise down a column of figures.
+//
+// What that function will NOT do is the part worth knowing: it trims only trailing ZEROS, so
+// "12.3400" shows as 12.34 while "12.3456" shows in full. A non-zero digit is never hidden, and
+// the underlying value is untouched — every request body still carries the wire string verbatim.
+// Legibility is still mostly the typeface's job: mono with tabular figures, which is why
+// "1,200.00" cannot be mistaken for "120.00" in a column.
 
 type MoneyTextProps = {
   money: Money
@@ -49,7 +55,7 @@ export function MoneyText({ money, showCurrency = true, className }: MoneyTextPr
 
   return (
     <span className={classes}>
-      {money.amount}
+      {formatForDisplay(money.amount, money.currency)}
       {/* A non-breaking space, so an amount never wraps away from its currency code. */}
       <span className={showCurrency ? styles.currency : 'sr-only'}>{'\u00A0'}{money.currency}</span>
     </span>

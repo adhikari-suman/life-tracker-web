@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { isCompleteAmount, isWireAmount, sanitizeAmountInput, toMoney } from './amount'
+import {
+  barWidth,
+  formatForDisplay,
+  isCompleteAmount,
+  isWireAmount,
+  sanitizeAmountInput,
+  subtractAmounts,
+  toMoney,
+} from './amount'
 
 /**
  * Amounts chosen because a double mangles every one of them. If any of these comes back changed,
@@ -168,5 +176,94 @@ describe('toMoney', () => {
   it('refuses something that is not an ISO 4217 code', () => {
     expect(() => toMoney('12.34', 'dollars')).toThrow(/iso 4217/i)
     expect(() => toMoney('12.34', 'usd')).toThrow(/iso 4217/i)
+  })
+})
+
+describe('subtractAmounts', () => {
+  it('is exact on the differences a double gets wrong', () => {
+    // 0.3 - 0.1 is 0.19999999999999998 in IEEE 754.
+    expect(subtractAmounts('0.3', '0.1')).toBe('0.2000')
+    expect(subtractAmounts('1.00', '0.9')).toBe('0.1000')
+  })
+
+  it('returns a negative when more went out than came in', () => {
+    expect(subtractAmounts('1200.00', '1500.00')).toBe('-300.0000')
+  })
+
+  it('holds past Number.MAX_SAFE_INTEGER', () => {
+    expect(subtractAmounts('9007199254740993.99', '0.99')).toBe('9007199254740993.0000')
+  })
+
+  it('round-trips through isWireAmount, so its output can be re-fed', () => {
+    expect(isWireAmount(subtractAmounts('2800.00', '1240.00'))).toBe(true)
+  })
+})
+
+describe('barWidth', () => {
+  it('gives a CSS percentage string, never a number', () => {
+    expect(barWidth('250.00', '1000.00')).toBe('25.00%')
+    expect(barWidth('1000.00', '1000.00')).toBe('100.00%')
+  })
+
+  it('keeps a tiny share visible in the string rather than rounding it to nothing', () => {
+    // 0.30 of 1000 is 0.03%. The visible floor is --bar-min-width in CSS; this proves the
+    // percentage itself does not collapse to zero first.
+    expect(barWidth('0.30', '1000.00')).toBe('0.03%')
+  })
+
+  it('draws no bar for a negative row', () => {
+    // A refund can make a category net negative for a month. Drawing its magnitude would say
+    // "a lot went here", which is the opposite of what happened.
+    expect(barWidth('-50.00', '1000.00')).toBe('0%')
+  })
+
+  it('does not divide by an empty total', () => {
+    expect(barWidth('50.00', '0.00')).toBe('0%')
+  })
+
+  it('clamps rather than overflowing the row', () => {
+    expect(barWidth('2000.00', '1000.00')).toBe('100.00%')
+  })
+})
+
+describe('formatForDisplay', () => {
+  it('trims the four wire digits down to the currency minor units', () => {
+    expect(formatForDisplay('12.3400', 'USD')).toBe('12.34')
+    expect(formatForDisplay('0.0000', 'USD')).toBe('0.00')
+  })
+
+  it('groups thousands', () => {
+    expect(formatForDisplay('12480.0000', 'GBP')).toBe('12,480.00')
+    expect(formatForDisplay('1234567.8900', 'USD')).toBe('1,234,567.89')
+    expect(formatForDisplay('999.0000', 'USD')).toBe('999.00')
+  })
+
+  it('NEVER hides a non-zero digit', () => {
+    // The whole point of trimming only trailing zeros. Rounding to two places here would be the
+    // display layer quietly disagreeing with the ledger about how much money there is.
+    expect(formatForDisplay('12.3456', 'USD')).toBe('12.3456')
+    expect(formatForDisplay('12.3450', 'USD')).toBe('12.345')
+  })
+
+  it('keeps the sign on a negative balance', () => {
+    expect(formatForDisplay('-5.0000', 'USD')).toBe('-5.00')
+    expect(formatForDisplay('-12480.0000', 'GBP')).toBe('-12,480.00')
+  })
+
+  it('respects currencies that are not two-decimal', () => {
+    expect(formatForDisplay('1000.0000', 'JPY')).toBe('1,000')
+    expect(formatForDisplay('12.3400', 'KWD')).toBe('12.340')
+  })
+
+  it('pads a short fraction so a column still aligns', () => {
+    expect(formatForDisplay('12.5', 'USD')).toBe('12.50')
+    expect(formatForDisplay('12', 'USD')).toBe('12.00')
+  })
+
+  it('returns a malformed amount untouched rather than mangling it', () => {
+    // MoneyText warns loudly about these in development. A visibly wrong figure beats a
+    // plausibly wrong one.
+    expect(formatForDisplay('0.30000000000000004', 'USD')).toBe('0.30000000000000004')
+    expect(formatForDisplay('NaN', 'USD')).toBe('NaN')
   })
 })
