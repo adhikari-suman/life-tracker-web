@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { TokenResponse } from '../api/generated/types.gen'
 import { getMe, listAccounts, logout } from '../api/generated/sdk.gen'
+import { SESSION_EXPIRED_EVENT } from '../api/authRefresh'
 import { clearSession, getAccessToken, storeSession } from './session'
 import { SessionContext, type SessionState } from './sessionContext'
 
@@ -40,6 +41,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void load()
   }, [load])
+
+  // When a refresh fails for good — an expired or replayed refresh token — the interceptor has
+  // already cleared the tokens and fires this. Drop to anonymous so the guard sends the user to
+  // /login on the next render, preserving where they were.
+  useEffect(() => {
+    function onExpired() {
+      setState({ status: 'anonymous' })
+    }
+    window.addEventListener(SESSION_EXPIRED_EVENT, onExpired)
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired)
+  }, [])
 
   const establish = useCallback(
     async (tokens: TokenResponse) => {

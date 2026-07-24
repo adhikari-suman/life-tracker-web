@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { Account, Label, Transaction } from '../api/generated/types.gen'
-import { NETWORK_FAILURE, type AppProblem } from '../api/problem'
+import { NETWORK_FAILURE, problemMessage, type AppProblem } from '../api/problem'
 import type { CommitEntry } from './useCommitQueue'
 import { TransactionRow } from './TransactionRow'
 import styles from './TransactionList.module.css'
@@ -131,7 +131,8 @@ export function TransactionList({
 }
 
 function failureMessage(problem: AppProblem | undefined): string {
-  if (problem === undefined) return 'Could not save this entry.'
-  if (problem.code === NETWORK_FAILURE) return 'Could not reach the server. Your values are back in the form.'
-  return 'The server rejected this entry. Your values are back in the form.'
+  if (problem === undefined) return 'Could not save this entry. Your values are back in the form.'
+  // The specific reason from the shared catalogue, plus the reassurance that nothing was lost —
+  // the entered values are restored to the form on any failure.
+  return `${problemMessage(problem)} Your values are back in the form.`
 }

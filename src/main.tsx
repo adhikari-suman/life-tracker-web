@@ -17,7 +17,12 @@ import './styles/tokens.css'
 
 import { BrowserRouter } from 'react-router'
 import { SessionProvider } from './auth/SessionProvider'
+import { installAuthRefresh } from './api/authRefresh'
 import App from './App.tsx'
+
+// Attach the token-refresh interceptor to the generated client before any request goes out, so
+// an access token expiring mid-session is rotated transparently rather than dropping the user.
+installAuthRefresh()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
