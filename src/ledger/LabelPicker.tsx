@@ -91,10 +91,12 @@ export function LabelPicker({ labels, value, onChange, onCreate }: LabelPickerPr
         className={styles.trigger}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-labelledby={`${listId}-label`}
+        // Both the field name AND the current value, so a screen reader announces "Label —
+        // optional, Uncategorized" rather than leaving the selection unspoken.
+        aria-labelledby={`${listId}-label ${listId}-value`}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className={selected === null ? styles.placeholder : styles.value}>
+        <span id={`${listId}-value`} className={selected === null ? styles.placeholder : styles.value}>
           {selected === null ? 'Uncategorized' : selected.path}
         </span>
         <span className={styles.caret} aria-hidden="true" />

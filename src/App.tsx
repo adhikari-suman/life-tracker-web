@@ -5,6 +5,7 @@ import { LoginPage } from './routes/LoginPage'
 import { LedgerPage } from './routes/LedgerPage'
 import { SetupPage } from './routes/SetupPage'
 import { AccountsPage } from './routes/AccountsPage'
+import { TransactionDetailPage } from './routes/TransactionDetailPage'
 import {
   RedirectIfSignedIn,
   RequireAccounts,
@@ -16,7 +17,6 @@ import {
   NotFoundPage,
   RegisterPage,
   ResetPasswordPage,
-  TransactionDetailPage,
   VerifyEmailPage,
 } from './routes/placeholders'
 

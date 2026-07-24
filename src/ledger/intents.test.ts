@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Account, Transaction } from '../api/generated/types.gen'
 import { INTENTS, intentSpec } from './intents'
-import { accountsById, describeTransaction } from './describeTransaction'
+import { accountsById, describeTransaction, reverseRequest } from './describeTransaction'
 
 // A minimal account of each kind, enough to classify a transaction by its legs.
 const ACC: Record<string, Account> = {
@@ -109,5 +109,39 @@ describe('describeTransaction reads postings back in the intent language', () =>
     const d = describeTransaction(txn('bank', 'groceries', '12.00'), new Map())
     expect(d.kind).toBe('OTHER')
     expect(d.fromAccount).toBeUndefined()
+  })
+
+  it('reads money coming back out of an expense as a Refund', () => {
+    // The shape a reversed Spent takes: Expense→Asset.
+    const d = describeTransaction(txn('groceries', 'bank', '12.00'), byId)
+    expect(d.kind).toBe('REFUND')
+    expect(d.verb).toBe('Refund')
+    // The label still attaches to the expense leg, which is now the source.
+    expect(d.labelPosting?.accountId).toBe('groceries')
+  })
+})
+
+describe('reverseRequest composes the mirror movement', () => {
+  it('swaps from and to, dates it today, and keeps the same amount for a same-currency txn', () => {
+    // Original: Spent 12.00 from bank on groceries.
+    const original = txn('bank', 'groceries', '12.00')
+    const mirror = reverseRequest(original, '2026-07-24')
+    // Reverse: money leaves groceries (the old destination) and returns to bank (the old source).
+    expect(mirror.from).toBe('groceries')
+    expect(mirror.to).toBe('bank')
+    expect(mirror.amount).toEqual({ amount: '12.00', currency: 'USD' })
+    expect(mirror.date).toBe('2026-07-24')
+    expect(mirror.toAmount).toBeUndefined()
+  })
+
+  it('carries both real figures for a cross-currency reversal, never a rate', () => {
+    // Original: Moved USD 100 that arrived as EUR 90.
+    const original = txn('bank', 'eur', '100.00', '90.00')
+    const mirror = reverseRequest(original, '2026-07-24')
+    // Now money leaves the euro account (90 EUR) and returns to the dollar account (100 USD).
+    expect(mirror.from).toBe('eur')
+    expect(mirror.to).toBe('bank')
+    expect(mirror.amount).toEqual({ amount: '90.00', currency: 'EUR' })
+    expect(mirror.toAmount).toEqual({ amount: '100.00', currency: 'USD' })
   })
 })

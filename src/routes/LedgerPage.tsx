@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router'
+import { useLocation, useNavigate, useSearchParams } from 'react-router'
 import type { RecordTransactionRequest } from '../api/generated/types.gen'
 import { useSession } from '../auth/useSession'
 import { EntryForm } from '../ledger/EntryForm'
@@ -24,6 +24,7 @@ const NO_ACCOUNTS: never[] = []
 export function LedgerPage() {
   const { state } = useSession()
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const accountFilter = searchParams.get('account') ?? undefined
 
@@ -74,6 +75,19 @@ export function LedgerPage() {
   const visibleQueue = queue.entries.filter(
     (e) => !(e.status === 'committed' && e.committed && serverIds.has(e.committed.id)),
   )
+
+  // A reversal arrives via router state from the detail view: stage it in the queue (once), so it
+  // appears as a pending row with a countdown and Cancel — reviewed, not posted silently. The
+  // history entry is replaced so a refresh or Back does not re-stage it.
+  const stagedReverse = useRef<RecordTransactionRequest | null>(null)
+  useEffect(() => {
+    const reverse = (location.state as { reverse?: RecordTransactionRequest } | null)?.reverse
+    if (reverse !== undefined && stagedReverse.current !== reverse) {
+      stagedReverse.current = reverse
+      queue.submit(reverse)
+      void navigate('/', { replace: true, state: null })
+    }
+  }, [location.state, navigate, queue])
 
   function handleSubmit(request: RecordTransactionRequest) {
     queue.submit(request)

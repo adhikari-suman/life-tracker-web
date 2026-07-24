@@ -1,4 +1,4 @@
-import type { Account, Money, Posting, Transaction } from '../api/generated/types.gen'
+import type { Account, Money, Posting, RecordTransactionRequest, Transaction } from '../api/generated/types.gen'
 import type { Intent } from './intents'
 
 // The inverse of the intent model: given a recorded transaction — which the wire hands back as
@@ -12,8 +12,12 @@ import type { Intent } from './intents'
 
 /** What a row or detail view needs, all in human terms. */
 export type TransactionDescription = {
-  /** The recording intents, plus OPENING (Equity→Asset from onboarding) and OTHER (anything the four intents do not cover). */
-  kind: Intent | 'OPENING' | 'OTHER'
+  /**
+   * The recording intents, plus OPENING (Equity→Asset from onboarding), REFUND (money coming
+   * back from an expense — the shape a reversed Spent takes, CONTEXT.md), and OTHER (anything the
+   * table does not otherwise cover, such as a reversed Earned or transfer).
+   */
+  kind: Intent | 'OPENING' | 'REFUND' | 'OTHER'
   /** The word shown to the user: "Spent", "Earned", "Moved", "Paid off", "Opening balance". */
   verb: string
   fromAccount: Account | undefined
@@ -35,6 +39,7 @@ const VERB: Record<TransactionDescription['kind'], string> = {
   MOVED: 'Moved',
   PAID_OFF: 'Paid off',
   OPENING: 'Opening balance',
+  REFUND: 'Refund',
   OTHER: 'Transaction',
 }
 
@@ -45,6 +50,8 @@ function classify(
   if (toKind === 'EXPENSE') return 'SPENT'
   if (fromKind === 'INCOME') return 'EARNED'
   if (fromKind === 'EQUITY') return 'OPENING'
+  // Money coming back OUT of an expense — a refund, and the shape a reversed Spent takes.
+  if (fromKind === 'EXPENSE') return 'REFUND'
   if (fromKind === 'ASSET' && toKind === 'ASSET') return 'MOVED'
   if (fromKind === 'ASSET' && toKind === 'LIABILITY') return 'PAID_OFF'
   return 'OTHER'
@@ -70,11 +77,15 @@ export function describeTransaction(
   // it is the amount that left the source (the credited `from`).
   const headlineAmount = kind === 'SPENT' || kind === 'OPENING' ? debit.amount : credit.amount
 
-  // The one leg that may hold a label is the Income or Expense account. Read it off the account
-  // kind rather than off labelId, so an uncategorized expense (labelId null) still reports the
-  // right posting as the one a label WOULD attach to.
+  // The one leg that may hold a label is the Income or Expense account, whichever side it is on.
+  // Read it off the account kind rather than off labelId, so an uncategorized expense (labelId
+  // null) still reports the right posting as the one a label WOULD attach to.
   const labelPosting =
-    toAccount?.kind === 'EXPENSE' ? debit : fromAccount?.kind === 'INCOME' ? credit : undefined
+    toAccount?.kind === 'EXPENSE' || toAccount?.kind === 'INCOME'
+      ? debit
+      : fromAccount?.kind === 'EXPENSE' || fromAccount?.kind === 'INCOME'
+        ? credit
+        : undefined
 
   return {
     kind,
@@ -93,4 +104,29 @@ export function describeTransaction(
 /** Convenience for building the lookup the function needs. */
 export function accountsById(accounts: readonly Account[]): Map<string, Account> {
   return new Map(accounts.map((a) => [a.id, a]))
+}
+
+/**
+ * Compose the mirror of a transaction: money flows the other way. `from` and `to` swap, each
+ * posting's real amount is carried in its own currency (so a cross-currency reversal never
+ * multiplies by a rate), and the date is TODAY — the reversal is a new event in an append-only
+ * ledger, not a rewrite of the original, which stays in history. The result is a request for the
+ * caller to stage for review, never to post silently.
+ */
+export function reverseRequest(
+  transaction: Transaction,
+  date: string,
+): RecordTransactionRequest {
+  const credit = transaction.postings.find((p) => p.direction === 'CREDIT') ?? transaction.postings[0]
+  const debit = transaction.postings.find((p) => p.direction === 'DEBIT') ?? transaction.postings[1]
+
+  // Reverse: money now leaves what was the destination and arrives in what was the source.
+  const crossCurrency = credit.amount.currency !== debit.amount.currency
+  return {
+    date,
+    from: debit.accountId,
+    to: credit.accountId,
+    amount: debit.amount,
+    ...(crossCurrency ? { toAmount: credit.amount } : {}),
+  }
 }

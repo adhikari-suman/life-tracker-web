@@ -20,15 +20,6 @@ function Placeholder({ title, task, children }: { title: string; task: string; c
 
 /* -------------------------------------------------------------------------- authenticated -- */
 
-export function TransactionDetailPage() {
-  return (
-    <Placeholder
-      title="Transaction"
-      task="the transaction detail, relabel and reverse task"
-    />
-  )
-}
-
 /* ------------------------------------------------------------------------ unauthenticated -- */
 
 export function RegisterPage() {
