@@ -1,5 +1,9 @@
-/* The centred column, masthead and rule moved to AuthLayout in Task 3, where the other four
-   unauthenticated routes share them. What is left here is the sign-in form itself. */
+/* The form styles shared by the authenticated-entry routes — sign in and register. Was
+   LoginPage.module.css until registration was built and turned out to need every rule in it
+   unchanged; two copies of an accent button would have drifted.
+
+   The centred column, masthead and rule live in AuthLayout, where the other unauthenticated
+   routes share them. What is left here is the form itself. */
 
 .form {
   display: flex;

@@ -13,10 +13,10 @@ import {
   RequireSession,
   RequireSetupPending,
 } from './routes/guards'
+import { RegisterPage } from './routes/RegisterPage'
 import {
   ForgotPasswordPage,
   NotFoundPage,
-  RegisterPage,
   ResetPasswordPage,
   VerifyEmailPage,
 } from './routes/placeholders'

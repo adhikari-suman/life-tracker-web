@@ -10,7 +10,7 @@ import { toAppProblem, type AppProblem } from '../api/problem'
 import { useSession } from '../auth/useSession'
 import { ProblemBanner } from '../components/ProblemBanner'
 import { TextField } from '../components/TextField'
-import styles from './LoginPage.module.css'
+import styles from './authForm.module.css'
 
 // UNAUTHORIZED is the same code the server returns when a token expires mid-session, but here it
 // can only mean the credentials were wrong. The wording is careful not to say WHICH was wrong:

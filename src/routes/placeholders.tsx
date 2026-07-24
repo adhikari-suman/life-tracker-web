@@ -7,6 +7,7 @@ import styles from './placeholders.module.css'
 //
 // They live in one file rather than eight near-identical ones. Each moves out to its own file
 // when the task named on it is built — at which point this file shrinks and eventually goes.
+// RegisterPage has already left; it lives in RegisterPage.tsx.
 
 function Placeholder({ title, task, children }: { title: string; task: string; children?: React.ReactNode }) {
   return (
@@ -21,18 +22,6 @@ function Placeholder({ title, task, children }: { title: string; task: string; c
 /* -------------------------------------------------------------------------- authenticated -- */
 
 /* ------------------------------------------------------------------------ unauthenticated -- */
-
-export function RegisterPage() {
-  return (
-    <Placeholder title="Create an account" task="registration is not in this build's task list">
-      <p className={styles.note}>
-        <Link to="/login" className={styles.link}>
-          Back to sign in
-        </Link>
-      </p>
-    </Placeholder>
-  )
-}
 
 export function ForgotPasswordPage() {
   return (
