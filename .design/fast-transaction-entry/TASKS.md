@@ -132,64 +132,64 @@ this repo.
 
 ## Core UI
 
-- [ ] **Amount field**: The largest element in the app — `--font-size-4xl`, mono, focused on
+- [x] **Amount field**: The largest element in the app — `--font-size-4xl`, mono, focused on
       mount, decimal keypad on mobile (`inputMode="decimal"`), currency adornment driven by the
       selected account. Done when it is usable one-handed on a 375px viewport and never holds a
       number in state. _New. Depends on: `MoneyText`. Build early — this is where the aesthetic
       direction gets judged._
 
-- [ ] **Intent selector**: Segmented control for Spent / Earned / Moved / Paid off. Always
+- [x] **Intent selector**: Segmented control for Spent / Earned / Moved / Paid off. Always
       visible, never a dropdown, options comparable at a glance. Selecting an intent is what
       filters the account pickers by kind. Done when choosing an intent visibly reconfigures the
       form beneath it. _New._
 
-- [ ] **Account pickers**: Two pickers filtered by account kind according to the active intent,
+- [x] **Account pickers**: Two pickers filtered by account kind according to the active intent,
       each showing the account's currency because that determines the cross-currency path. Done
       when it is structurally impossible to select a pairing the chosen intent does not permit.
       _New. Depends on: intent selector._
 
-- [ ] **Label picker with inline creation**: Flat `listLabels` fetch cached client-side and
+- [x] **Label picker with inline creation**: Flat `listLabels` fetch cached client-side and
       filtered in memory (the spec states there is deliberately no search endpoint), rendering a
       ≤3-level tree with full paths for disambiguation. **Must include create-inline** via
       `createLabel` — label management is out of scope, so without it no label can ever exist.
       Renders **not at all** for Moved and Paid off. Done when switching to Moved removes the
       field entirely rather than disabling it. _New._
 
-- [ ] **Cross-currency second amount**: A `toAmount` field that appears only when the two selected
+- [x] **Cross-currency second amount**: A `toAmount` field that appears only when the two selected
       accounts differ in currency, labelled as the figure that *actually arrived*. The app never
       multiplies by a rate to produce an amount. Done when a same-currency pairing never shows it
       and a cross-currency one cannot be submitted without it. _New. Depends on: account pickers,
       amount field._
 
-- [ ] **Transaction list**: Newest-first, virtualized, reading `listTransactions`. Reconstructs
+- [x] **Transaction list**: Newest-first, virtualized, reading `listTransactions`. Reconstructs
       each row in the intent's language from its postings — never as debits and credits. Supports
       the `?account=` filter. Done when 5,000 transactions scroll without jank. _New. Depends on:
       `MoneyText`._
 
 ## Interactions & States
 
-- [ ] **The undo commit queue**: The brief's central mechanism. On submit the row appears
+- [x] **The undo commit queue**: The brief's central mechanism. On submit the row appears
       immediately and a countdown starts; the POST fires only when it elapses. Cancel removes the
       row having sent nothing. Covers: pending, committing, committed, failed-with-values-restored,
       and cancelled. Also handles navigation and tab-close while an entry is pending — the queue
       must not silently lose it. Done when a cancelled entry provably never reached the server.
       _New. The highest-risk interaction; do not defer it behind polish._
 
-- [ ] **First-run onboarding at `/setup`**: Guided creation of a minimum account set — one asset,
+- [x] **First-run onboarding at `/setup`**: Guided creation of a minimum account set — one asset,
       one coarse expense, one income, one equity for opening balances. N sequential `createAccount`
       calls with visible progress. **Must be resumable, not restartable**: there is no bulk
       endpoint, no rollback and no delete, so a partial failure leaves real accounts behind and
       re-running the whole flow would duplicate them permanently. Done when killing the network
       halfway and retrying produces no duplicates. _New. Depends on: app shell._
 
-- [ ] **Transaction detail, relabel, and reverse**: `/transactions/:id` showing what happened in
+- [x] **Transaction detail, relabel, and reverse**: `/transactions/:id` showing what happened in
       the intent's language. Relabel in place via `setPostingLabel`/`clearPostingLabel`. "Reverse
       this" composes a mirror transaction with `from`/`to` swapped, dated today, and lands the
       user on `/` with it **pre-filled for review** rather than posting silently. Done when there
       is no edit affordance anywhere, because the API has none. _New. Depends on: transaction
       list, entry form._
 
-- [ ] **`Problem` error handling**: A banner and inline field errors driven by RFC 7807, switching
+- [x] **`Problem` error handling**: A banner and inline field errors driven by RFC 7807, switching
       on `Problem.code` and never on `detail` prose. Covers at minimum `VALIDATION`,
       `ACCOUNT_NOT_FOUND`, `SAME_ACCOUNT`, `CONVERTED_AMOUNT_REQUIRED`, `LABEL_NOT_APPLICABLE`,
       `LABEL_ARCHIVED`, `TOO_MANY_ATTEMPTS` (with `Retry-After`), and `UNAUTHORIZED` triggering
@@ -197,19 +197,19 @@ this repo.
       elsewhere, so the generated union will be incomplete — handle unknown codes gracefully and
       raise the spec fix upstream. _New._
 
-- [ ] **Token refresh and session expiry**: Single-use rotation via `refresh`, queuing concurrent
+- [x] **Token refresh and session expiry**: Single-use rotation via `refresh`, queuing concurrent
       401s behind one refresh, and a replayed token revoking the session and returning to
       `/login`. Done when an access token expiring mid-entry does not lose the user's typed
       values. _New._
 
 ## Responsive & Polish
 
-- [ ] **Responsive layout**: Single column below 640px with the amount field and keypad in the
+- [x] **Responsive layout**: Single column below 640px with the amount field and keypad in the
       lower half. From **1024px** the entry form and transaction list sit side by side and entry
       becomes a persistent panel rather than a route — a behavioural change, not a reflow.
       Breakpoints: 375, 768, 1024, 1280. _Depends on: transaction list, entry form._
 
-- [ ] **Accessibility pass**: Full keyboard path through entry including the label tree and the
+- [x] **Accessibility pass**: Full keyboard path through entry including the label tree and the
       undo cancel; `role="status"` on the countdown; the undo window adjustable and disableable
       (WCAG 2.2.1); accessible names on amount fields including currency; focus to the new row on
       commit and back to the amount field on reset; `prefers-reduced-motion` honoured without
@@ -217,7 +217,7 @@ this repo.
       direction must read from sign and wording. _Checks drawn from the brief's accessibility
       section._
 
-- [ ] **Dark mode verification**: Confirm both `[data-theme="dark"]` and `prefers-color-scheme`
+- [x] **Dark mode verification**: Confirm both `[data-theme="dark"]` and `prefers-color-scheme`
       paths, and that the manual toggle overrides the system preference in both directions.
       Token values are already contrast-verified; this task confirms they are actually applied.
       _Depends on: all UI tasks._

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router'
 import { useSession } from '../auth/useSession'
+import { useTheme, type Theme } from '../theme/useTheme'
 import styles from './AppShell.module.css'
 
 /**
@@ -55,8 +56,15 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
  * to the Ledger, where it means a place a balance lives. The context map calls that collision out
  * as deliberate, so the UI does not get to blur it.
  */
+const THEMES: { value: Theme; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+]
+
 function ProfileMenu() {
   const { state, signOut } = useSession()
+  const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -122,6 +130,28 @@ function ProfileMenu() {
           {!state.user.emailVerified && (
             <p className={styles.unverified}>Email not verified</p>
           )}
+
+          <hr className={styles.menuRule} />
+
+          {/* Theme choice. A segmented control, labelled, so the current choice is announced and
+              the manual override reads clearly against "System". */}
+          <div className={styles.themeRow} role="radiogroup" aria-label="Theme">
+            <span className={styles.themeLabel}>Theme</span>
+            <div className={styles.themeOptions}>
+              {THEMES.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={theme === option.value}
+                  className={theme === option.value ? `${styles.themeOption} ${styles.themeOptionOn}` : styles.themeOption}
+                  onClick={() => setTheme(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <hr className={styles.menuRule} />
 

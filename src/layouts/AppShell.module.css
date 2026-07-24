@@ -139,6 +139,53 @@
   border-top: var(--border-width-thin) solid var(--color-border-subtle);
 }
 
+.themeRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+}
+
+.themeLabel {
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.themeOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: var(--border-width-thin) solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-bg-tertiary);
+}
+
+.themeOption {
+  min-height: 2rem;
+  padding: 0 var(--space-1);
+  border: 0;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.themeOption:hover:not(.themeOptionOn) {
+  color: var(--color-text-primary);
+}
+
+.themeOptionOn {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: var(--shadow-sm);
+}
+
 .signOut {
   display: block;
   width: 100%;

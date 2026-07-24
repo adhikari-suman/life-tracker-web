@@ -9,6 +9,18 @@
     <meta name="theme-color" content="#FAFAF9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#161513" media="(prefers-color-scheme: dark)" />
     <title>Life Tracker</title>
+    <!-- Apply the saved theme BEFORE first paint, so a manual choice does not flash the system
+         theme first. 'system' leaves the attribute off, letting prefers-color-scheme decide. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('lt.theme')
+          if (saved === 'light' || saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', saved)
+          }
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
