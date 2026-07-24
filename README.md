@@ -23,8 +23,9 @@ on `localhost:8080`, which is what this app expects by default.
 ```sh
 cd ../life-tracker-backend
 
-# Everything in containers, including the app.
-docker compose --profile full up -d --build
+# Everything in containers, including the app. The app service is deploy.replicas: 0 by default
+# (so a bare `up` starts only its dependencies), and --scale app=1 opts it in.
+docker compose up -d --build --scale app=1
 
 # Or: dependencies only — Postgres, keypair, migrations — with the app on the host.
 docker compose up -d

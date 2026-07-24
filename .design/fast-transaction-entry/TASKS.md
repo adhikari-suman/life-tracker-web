@@ -38,7 +38,7 @@ this repo.
       > throughout; tokens and both IBM Plex faces load; typecheck, lint and build are clean.
       >
       > The acceptance test was run for real against `life-tracker-backend`'s compose stack
-      > (`docker compose --profile full up -d --build`), with no stubs anywhere: a registered
+      > (`docker compose up -d --build --scale app=1`), with no stubs anywhere: a registered
       > credential returns HTTP 200 and stores a genuine three-part RS256 JWT whose `iss` is
       > `http://localhost:8080/v1`, and a wrong password returns the backend's real RFC 7807
       > body, which renders as "Email or password is incorrect." — designed copy switched on
@@ -91,11 +91,44 @@ this repo.
       > exposes `valueAsNumber`, which is the hazard itself. It is at base size here; Task 4
       > scales it to `--amount-field-font-size`.
 
-- [ ] **App shell and the redirect guard**: `AppShell` (top bar, two nav destinations, account
+- [x] **App shell and the redirect guard**: `AppShell` (top bar, two nav destinations, account
       menu), `AuthLayout`, routing for all nine routes, and the three-step guard from the IA — no
       session → `/login`; session with zero accounts → `/setup`, unskippable; otherwise the
       requested route. Done when the guard is provably unbypassable by typing a URL. _New.
       Depends on: sign-in screen._
+
+      > **Done, and proven both ways.** react-router, all nine routes, and the three-step guard.
+      > The guard chain IS the route tree — every authenticated route nests inside RequireSession,
+      > the ledger routes inside RequireAccounts as well — so the IA's order is a structural
+      > property rather than a rule each page repeats. There is no per-page check to forget.
+      >
+      > "Provably unbypassable by typing a URL" is met by `guards.test.tsx`: 30 tests driving the
+      > real router and SessionProvider (only the SDK mocked), entering every route directly from
+      > each session state. And it was proven LIVE against the backend — 8 browser checks — using
+      > the seeded `designer@example.com`, whose Book has zero accounts: signing in lands on
+      > `/setup`, and typing `/` or `/accounts` bounces straight back. Create one account through
+      > the API and the same routes serve the ledger, while `/setup` now bounces to `/`.
+      >
+      > **The session is read from the server, never from storage.** A token in `sessionStorage`
+      > is not treated as a session — `getMe` answering 200 is. A stale or hand-typed token
+      > resolves to anonymous and is discarded, so the bounce to `/login` does not loop. The
+      > accounts fetch feeds the second step the same way.
+      >
+      > **One real bug, caught by the tests.** The post-login return-path (go back to the page you
+      > were headed for) was being defeated: `establish()` flips the session to authenticated,
+      > `RedirectIfSignedIn` fires its own redirect to `/`, and that raced — and beat — the
+      > explicit navigate in LoginPage. Fixed by making the guard the single authority: it reads
+      > the stashed `from` and LoginPage issues no navigate at all. `safeReturnPath` rejects
+      > protocol-relative `//evil.example` so the return path cannot become an open redirect.
+      >
+      > **The backend's dev command changed under us.** `compose.yaml` was rewritten to make the
+      > app `deploy.replicas: 0` and drop the `full` profile, so the live-verification note on
+      > Task 1 and the README both said `--profile full`, which now silently starts nothing. Both
+      > are corrected to `docker compose up -d --build --scale app=1`.
+      >
+      > Every route in the IA resolves; the pages behind the eight not-yet-built ones are labelled
+      > placeholders in `src/routes/placeholders.tsx`, each naming the task that replaces it. The
+      > post-sign-in stub App from Task 1 is gone.
 
 ## Core UI
 

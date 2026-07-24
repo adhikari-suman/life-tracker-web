@@ -1,0 +1,6 @@
+/* Occupies the viewport so the page does not collapse to nothing and then jump when the real
+   route mounts. Visually empty on purpose — see the component. */
+.wait {
+  min-height: 100dvh;
+  background: var(--color-bg-primary);
+}

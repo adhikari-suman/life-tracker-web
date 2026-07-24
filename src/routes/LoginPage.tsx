@@ -1,4 +1,5 @@
 import { useRef, useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
 
 // The generated SDK. `login` is named for the spec's operationId — life-tracker-contracts is
 // explicit that operationId IS the generated method name, which is why renaming one there is a
@@ -6,7 +7,7 @@ import { useRef, useState, type FormEvent } from 'react'
 // the URL and the response type all come from openapi.yaml.
 import { login } from '../api/generated/sdk.gen'
 import { toAppProblem, type AppProblem } from '../api/problem'
-import { storeSession } from '../auth/session'
+import { useSession } from '../auth/useSession'
 import { ProblemBanner } from '../components/ProblemBanner'
 import { TextField } from '../components/TextField'
 import styles from './LoginPage.module.css'
@@ -20,11 +21,8 @@ const LOGIN_MESSAGES = {
   UNAUTHORIZED: () => 'Email or password is incorrect.',
 }
 
-type LoginPageProps = {
-  onSignedIn: () => void
-}
-
-export function LoginPage({ onSignedIn }: LoginPageProps) {
+export function LoginPage() {
+  const { establish } = useSession()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ email: string | null; password: string | null }>({
@@ -66,8 +64,11 @@ export function LoginPage({ onSignedIn }: LoginPageProps) {
     setSubmitting(false)
 
     if (data !== undefined) {
-      storeSession(data)
-      onSignedIn()
+      // Store the tokens and load the session behind them — nothing more. The redirect is not
+      // issued here: establishing the session flips it to authenticated, and RedirectIfSignedIn
+      // (which wraps this route) sends the user on, to the page they were originally headed for
+      // if RequireSession recorded one. Navigating here as well would race that guard and lose.
+      await establish(data)
       return
     }
 
@@ -85,16 +86,10 @@ export function LoginPage({ onSignedIn }: LoginPageProps) {
     passwordRef.current?.select()
   }
 
+  // The masthead, the centred column and the rule now live in AuthLayout, shared with the other
+  // four unauthenticated routes.
   return (
-    <main className={styles.screen}>
-      <div className={styles.panel}>
-        <header className={styles.masthead}>
-          <h1 className={styles.wordmark}>Life Tracker</h1>
-          <p className={styles.tagline}>Money in, money out, and where it actually went.</p>
-        </header>
-
-        <hr className={styles.rule} />
-
+    <>
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <h2 className={styles.heading}>Sign in</h2>
 
@@ -141,18 +136,17 @@ export function LoginPage({ onSignedIn }: LoginPageProps) {
           </button>
         </form>
 
-        {/* These routes are in the IA and the screen is incomplete without them — a sign-in form
-            with no way to register is a dead end. The router that makes them resolve is Task 3;
-            until then they are honest hrefs to the paths the IA already fixed. */}
+        {/* Real client-side links as of Task 3. Both destinations resolve; the pages behind them
+            are placeholders, which is the honest state — a sign-in form with no way to register
+            is a dead end, and a link to a route that 404s is a worse one. */}
         <nav className={styles.links}>
-          <a className={styles.link} href="/register">
+          <Link className={styles.link} to="/register">
             Create an account
-          </a>
-          <a className={styles.link} href="/forgot-password">
+          </Link>
+          <Link className={styles.link} to="/forgot-password">
             Forgot your password?
-          </a>
+          </Link>
         </nav>
-      </div>
-    </main>
+    </>
   )
 }

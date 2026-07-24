@@ -1,42 +1,82 @@
-import { useState } from 'react'
+import { Route, Routes } from 'react-router'
+import { AppShell } from './layouts/AppShell'
+import { AuthLayout } from './layouts/AuthLayout'
 import { LoginPage } from './routes/LoginPage'
-import { clearSession, getAccessToken } from './auth/session'
-import styles from './App.module.css'
+import {
+  RedirectIfSignedIn,
+  RequireAccounts,
+  RequireSession,
+  RequireSetupPending,
+} from './routes/guards'
+import {
+  AccountsPage,
+  ForgotPasswordPage,
+  LedgerPage,
+  NotFoundPage,
+  RegisterPage,
+  ResetPasswordPage,
+  SetupPage,
+  TransactionDetailPage,
+  VerifyEmailPage,
+} from './routes/placeholders'
 
 /**
- * There is no router yet — Task 3 brings react-router, the nine routes from the IA, and the
- * three-step redirect guard (no session → /login; session with zero accounts → /setup;
- * otherwise the requested route). Until then this is the smallest thing that makes Task 1's
- * slice observable end to end: sign in, and see that a real token came back.
+ * The nine routes from the information architecture, and nothing else.
+ *
+ * The nesting IS the redirect chain. Every authenticated route sits inside RequireSession, and
+ * the ledger routes sit inside RequireAccounts as well, so the order the IA specifies — no
+ * session, then no accounts, then the requested route — is a structural property of this tree
+ * rather than a rule each page has to remember. Putting a route in the wrong block is a visible
+ * mistake here; forgetting a check inside a page would not be.
  */
 export default function App() {
-  const [signedIn, setSignedIn] = useState(() => getAccessToken() !== null)
-
-  if (!signedIn) {
-    return <LoginPage onSignedIn={() => setSignedIn(true)} />
-  }
-
   return (
-    <main className={styles.placeholder}>
-      <div>
-        <h1 className={styles.heading}>Signed in</h1>
-        <p className={styles.note}>
-          The ledger lands in the tasks after this one. This screen exists only to show that the
-          sign-in slice completed and a session is held.
-        </p>
-        <button
-          className={styles.signOut}
-          type="button"
-          onClick={() => {
-            // Local only. Revoking the Session server-side is the `logout` operation, and it
-            // belongs with the app shell's account menu in Task 3 rather than here.
-            clearSession()
-            setSignedIn(false)
-          }}
-        >
-          Sign out
-        </button>
-      </div>
-    </main>
+    <Routes>
+      {/* ---------------------------------------------------------------- unauthenticated -- */}
+      <Route element={<AuthLayout />}>
+        {/* Pointless with a session open — you cannot sign in twice, or register as someone you
+            already are. */}
+        <Route element={<RedirectIfSignedIn />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
+        {/* Deliberately reachable with OR without a session. A signed-in user can want a
+            password reset, and /verify-email is opened from an emailed link by someone who is
+            usually already signed in — bouncing them to the ledger would spend the token's one
+            use and tell them nothing. */}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+      </Route>
+
+      {/* ------------------------------------------------------------------ authenticated -- */}
+      <Route element={<RequireSession />}>
+        {/* Chrome-free on purpose: there is nothing to navigate away to until the Book works, so
+            the shell is not rendered around it. */}
+        <Route element={<RequireSetupPending />}>
+          <Route path="/setup" element={<SetupPage />} />
+        </Route>
+
+        <Route element={<RequireAccounts />}>
+          <Route element={<AppShell />}>
+            <Route path="/" element={<LedgerPage />} />
+            <Route path="/accounts" element={<AccountsPage />} />
+            <Route path="/transactions/:id" element={<TransactionDetailPage />} />
+          </Route>
+        </Route>
+      </Route>
+
+      {/* Outside every guard. An unknown address is not a permission problem, and answering one
+          with a redirect to /login would tell an anonymous visitor that the address exists. */}
+      <Route
+        path="*"
+        element={
+          <AuthLayout>
+            <NotFoundPage />
+          </AuthLayout>
+        }
+      />
+    </Routes>
   )
 }

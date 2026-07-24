@@ -15,10 +15,19 @@ import '@fontsource/ibm-plex-mono/500.css'
 // properties; no component re-imports this file.
 import './styles/tokens.css'
 
+import { BrowserRouter } from 'react-router'
+import { SessionProvider } from './auth/SessionProvider'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    {/* SessionProvider sits INSIDE the router, because signing out navigates. It sits OUTSIDE
+        App so the session is read once, at startup, rather than re-fetched by every route
+        change. */}
+    <BrowserRouter>
+      <SessionProvider>
+        <App />
+      </SessionProvider>
+    </BrowserRouter>
   </StrictMode>,
 )
