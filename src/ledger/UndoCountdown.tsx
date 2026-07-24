@@ -15,9 +15,11 @@ type UndoCountdownProps = {
   deadline: number | undefined
   onCancel: () => void
   committing: boolean
+  /** `inverse` for the dark mobile toast, where text and the Cancel button must read light. */
+  tone?: 'default' | 'inverse'
 }
 
-export function UndoCountdown({ deadline, onCancel, committing }: UndoCountdownProps) {
+export function UndoCountdown({ deadline, onCancel, committing, tone = 'default' }: UndoCountdownProps) {
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
@@ -28,9 +30,11 @@ export function UndoCountdown({ deadline, onCancel, committing }: UndoCountdownP
     return () => clearInterval(timer)
   }, [deadline])
 
+  const wrapClass = tone === 'inverse' ? `${styles.wrap} ${styles.inverse}` : styles.wrap
+
   if (committing || deadline === undefined) {
     return (
-      <div className={styles.wrap}>
+      <div className={wrapClass}>
         <span className={styles.status} role="status">
           Saving…
         </span>
@@ -42,7 +46,7 @@ export function UndoCountdown({ deadline, onCancel, committing }: UndoCountdownP
   const seconds = Math.ceil(remainingMs / 1000)
 
   return (
-    <div className={styles.wrap}>
+    <div className={wrapClass}>
       {/* Polite, not assertive: it should not interrupt, only be available. The count is the
           content, so a screen reader announces "3 seconds to undo" as it changes. */}
       <span className={styles.status} role="status">

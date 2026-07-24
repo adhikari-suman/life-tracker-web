@@ -20,6 +20,15 @@
   color: var(--color-text-tertiary);
 }
 
+/* Inline pending rows belong to the desktop layout, where the list sits beside the form and is
+   always in view. Below the split, the pinned MobileUndoToast is the recall affordance, so these
+   are hidden to avoid a duplicate — and a duplicate live region. */
+@media (max-width: 1023px) {
+  .pendingInline {
+    display: none;
+  }
+}
+
 /* The windowed region. A bounded height turns the whole history into a scroll rather than a page
    that grows without limit. On desktop the panel governs the height; here it caps it. */
 .scroll {

@@ -1,0 +1,54 @@
+/* Pinned to the bottom safe area on mobile; gone at the desktop split where the inline countdown
+   in the list is already visible. */
+
+.toast {
+  position: fixed;
+  inset-inline: var(--space-4);
+  /* Above the iOS/Android home indicator, not under it. */
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--border-radius-lg);
+  background: var(--toast-bg);
+  color: var(--toast-text);
+  box-shadow: var(--toast-shadow);
+}
+
+@media (min-width: 1024px) {
+  .toast {
+    display: none;
+  }
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.verb {
+  font-weight: var(--font-weight-medium);
+  color: var(--toast-text);
+}
+
+.amount {
+  /* On the inverse surface the money keeps its mono treatment but must read light. */
+  color: var(--toast-text);
+}
+
+.more {
+  margin-inline-start: auto;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* The countdown's Cancel button and status text sit on the dark toast; lift their colours so
+   they read against it. The countdown component's own layout is reused unchanged. */
+.toast :global(.money) {
+  color: var(--toast-text);
+}

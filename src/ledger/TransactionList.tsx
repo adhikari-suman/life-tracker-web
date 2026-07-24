@@ -66,35 +66,38 @@ export function TransactionList({
     <section className={styles.list} aria-label="Recent transactions">
       <h2 className={styles.heading}>Recent</h2>
 
-      {/* Pending / committing / failed entries. Not windowed — there are only ever a handful. */}
-      {queueEntries.map((entry) => {
-        const transaction = entry.committed ?? entry.optimistic
-        if (entry.status === 'pending' || entry.status === 'committing') {
-          return (
+      {/* Pending / committing entries, inline. Hidden below the 1024px split, where the pinned
+          MobileUndoToast is the recall affordance instead — so the countdown is not both
+          below the fold here AND in the toast, which would double the role="status"
+          announcement. Not windowed; there are only ever a handful. */}
+      <div className={styles.pendingInline}>
+        {queueEntries
+          .filter((entry) => entry.status === 'pending' || entry.status === 'committing')
+          .map((entry) => (
             <TransactionRow
               key={entry.id}
-              transaction={transaction}
+              transaction={entry.optimistic}
               accountsById={accountsById}
               labelsById={labelsById}
               committing={entry.status === 'committing'}
               pending={{ deadline: entry.deadline, onCancel: () => onCancel(entry.id) }}
             />
-          )
-        }
-        if (entry.status === 'failed') {
-          return (
-            <TransactionRow
-              key={entry.id}
-              transaction={transaction}
-              accountsById={accountsById}
-              labelsById={labelsById}
-              failed={{ message: failureMessage(entry.problem), onDismiss: () => onDismiss(entry.id) }}
-            />
-          )
-        }
-        // 'committed' entries are shown by the server list once refetched; render nothing here.
-        return null
-      })}
+          ))}
+      </div>
+
+      {/* Failed entries stay inline at every width — they are not recallable and the toast does
+          not carry them, so the list is where the user dismisses them. */}
+      {queueEntries
+        .filter((entry) => entry.status === 'failed')
+        .map((entry) => (
+          <TransactionRow
+            key={entry.id}
+            transaction={entry.committed ?? entry.optimistic}
+            accountsById={accountsById}
+            labelsById={labelsById}
+            failed={{ message: failureMessage(entry.problem), onDismiss: () => onDismiss(entry.id) }}
+          />
+        ))}
 
       {problem !== null && total === 0 && (
         <p className={styles.note}>Could not load your transactions. {problem.code === NETWORK_FAILURE ? 'Check your connection.' : 'Try again shortly.'}</p>

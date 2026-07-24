@@ -224,7 +224,16 @@ this repo.
 
 ## Review
 
-- [ ] **Design review**: Run `/design-review` against the brief.
+- [x] **Design review**: Run `/design-review` against the brief.
+
+      > **Done.** `DESIGN_REVIEW.md` in this folder, with a 12-screenshot set under `screenshots/`
+      > captured against the live backend at desktop/tablet/mobile plus dark mode. Verdict: a
+      > faithful Rams execution, no Must Fix. The one Should Fix with real impact — the undo
+      > affordance sitting below the fold on mobile, where the brief asked for a toast pinned above
+      > the safe area — was fixed during the review (`MobileUndoToast`). Two smaller items remain
+      > for a conscious decision: money rendering four fractional digits (correct under the verbatim
+      > money rule, but noisy for 2-decimal currencies), and the single-column form running
+      > full-width on a wide tablet. Both are documented with fixes that keep the money discipline.
 
 ---
 

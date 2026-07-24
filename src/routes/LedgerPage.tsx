@@ -5,6 +5,7 @@ import { useSession } from '../auth/useSession'
 import { EntryForm } from '../ledger/EntryForm'
 import { draftFromRequest, type EntryDraft } from '../ledger/entryDraft'
 import { TransactionList } from '../ledger/TransactionList'
+import { MobileUndoToast } from '../ledger/MobileUndoToast'
 import { useLabels } from '../ledger/useLabels'
 import { useTransactions } from '../ledger/useTransactions'
 import { useCommitQueue } from '../ledger/useCommitQueue'
@@ -119,6 +120,10 @@ export function LedgerPage() {
           onOpen={(id) => void navigate(`/transactions/${id}`)}
         />
       </div>
+
+      {/* Below the 1024px split only: surfaces the still-recallable entry above the safe area, so
+          the undo window is not stranded below the fold after recording. */}
+      <MobileUndoToast entries={visibleQueue} accountsById={accountsById} onCancel={queue.cancel} />
     </div>
   )
 }

@@ -30,3 +30,18 @@
 .cancel:hover {
   background: var(--color-bg-tertiary);
 }
+
+/* On the dark mobile toast: light status text, and a Cancel that reads against near-black. */
+.inverse .status {
+  color: var(--color-text-inverse);
+}
+
+.inverse .cancel {
+  border-color: var(--color-text-inverse);
+  background: transparent;
+  color: var(--color-text-inverse);
+}
+
+.inverse .cancel:hover {
+  background: rgb(255 255 255 / 0.12);
+}
