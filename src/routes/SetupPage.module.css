@@ -1,0 +1,171 @@
+/* Chrome-free by design (the IA): onboarding has no top bar, because there is nowhere to
+   navigate to until the Book works. A single centred column, like the auth screens. */
+
+.screen {
+  min-height: 100dvh;
+  display: grid;
+  align-content: start;
+  padding: var(--space-7) var(--space-5) var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .screen {
+    padding-top: var(--space-8);
+  }
+}
+
+.panel {
+  width: 100%;
+  max-width: var(--max-width-form);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.wordmark {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.currencyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.currencyLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.currencySelect {
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-3);
+  border: var(--border-width-thin) solid var(--color-border-strong);
+  border-radius: var(--field-radius);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.itemHead {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.itemHead > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.badge {
+  flex: none;
+  min-height: var(--size-touch-target);
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.badge_done {
+  color: var(--color-status-success);
+}
+
+.badge_creating {
+  color: var(--color-text-secondary);
+}
+
+.badge_error {
+  color: var(--color-status-error);
+}
+
+.badge_idle {
+  color: transparent;
+}
+
+.help {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.opening {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-4);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.submit {
+  min-height: calc(var(--size-touch-target) + var(--space-1));
+  padding: var(--space-2) var(--space-5);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--border-radius-md);
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--easing-default);
+}
+
+.submit:hover:not([aria-disabled='true']) {
+  background: var(--color-accent-primary-hover);
+}
+
+.submit[aria-disabled='true'] {
+  background: var(--color-accent-secondary);
+  cursor: progress;
+}

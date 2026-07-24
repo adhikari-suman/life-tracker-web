@@ -3,6 +3,8 @@ import { AppShell } from './layouts/AppShell'
 import { AuthLayout } from './layouts/AuthLayout'
 import { LoginPage } from './routes/LoginPage'
 import { LedgerPage } from './routes/LedgerPage'
+import { SetupPage } from './routes/SetupPage'
+import { AccountsPage } from './routes/AccountsPage'
 import {
   RedirectIfSignedIn,
   RequireAccounts,
@@ -10,12 +12,10 @@ import {
   RequireSetupPending,
 } from './routes/guards'
 import {
-  AccountsPage,
   ForgotPasswordPage,
   NotFoundPage,
   RegisterPage,
   ResetPasswordPage,
-  SetupPage,
   TransactionDetailPage,
   VerifyEmailPage,
 } from './routes/placeholders'

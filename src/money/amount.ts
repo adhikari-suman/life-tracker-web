@@ -101,6 +101,38 @@ export function isNegativeAmount(value: string): boolean {
   return value.startsWith('-')
 }
 
+// Exact decimal arithmetic on amount strings, via BigInt scaled to the spec's four fractional
+// digits. BigInt is arbitrary-precision INTEGER math — not IEEE 754 — so it is exactly the tool
+// the float ban points away from. The result keeps four fractional digits, matching the balances
+// the server returns; MoneyText still renders whatever this produces verbatim.
+
+const SCALE = MAX_FRACTION_DIGITS
+
+function toScaled(value: string): bigint {
+  const negative = value.startsWith('-')
+  const body = negative ? value.slice(1) : value
+  const [intPart, fracPart = ''] = body.split('.')
+  const frac = (fracPart + '0'.repeat(SCALE)).slice(0, SCALE)
+  const scaled = BigInt(intPart + frac)
+  return negative ? -scaled : scaled
+}
+
+function fromScaled(value: bigint): string {
+  const negative = value < 0n
+  const digits = (negative ? -value : value).toString().padStart(SCALE + 1, '0')
+  const intPart = digits.slice(0, digits.length - SCALE)
+  const frac = digits.slice(digits.length - SCALE)
+  return `${negative ? '-' : ''}${intPart}.${frac}`
+}
+
+/**
+ * Sum two amount strings of the SAME currency, exactly. Adding across currencies is meaningless
+ * and is the caller's responsibility to avoid — this function knows only about the numbers.
+ */
+export function addAmounts(a: string, b: string): string {
+  return fromScaled(toScaled(a) + toScaled(b))
+}
+
 /**
  * The only way this app builds a `Money`. Validates rather than trusts, and throws rather than
  * returning something malformed, because every caller is handing this to the wire: a bad amount

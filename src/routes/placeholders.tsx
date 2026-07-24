@@ -20,36 +20,12 @@ function Placeholder({ title, task, children }: { title: string; task: string; c
 
 /* -------------------------------------------------------------------------- authenticated -- */
 
-export function AccountsPage() {
-  return (
-    <Placeholder
-      title="Accounts"
-      task="balances grouped by kind, totalled per currency and never across them"
-    />
-  )
-}
-
 export function TransactionDetailPage() {
   return (
     <Placeholder
       title="Transaction"
       task="the transaction detail, relabel and reverse task"
     />
-  )
-}
-
-export function SetupPage() {
-  return (
-    <Placeholder
-      title="Set up your accounts"
-      task="the first-run onboarding task, which must be resumable rather than restartable"
-    >
-      <p className={styles.note}>
-        Recording anything needs at least one account to spend from and one to spend on. This is
-        the only screen in the app you cannot navigate away from, because every other one would
-        be a form that cannot succeed.
-      </p>
-    </Placeholder>
   )
 }
 
