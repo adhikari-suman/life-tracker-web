@@ -1,0 +1,92 @@
+/* A rule above and below: the control is a boundary, and drawing it as one is what says the net
+   worth figure overhead is not inside its scope. Borders over shadows — Rams. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-block: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.field,
+.scope {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.label {
+  padding: 0;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.select {
+  height: var(--field-height);
+  min-width: 10rem;
+  padding-inline: var(--space-3);
+  background: var(--field-bg);
+  /* --color-border-strong, never --color-border-primary: the latter measures 1.32:1 and fails
+     WCAG 1.4.11 for an interactive boundary. */
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+.segments {
+  display: flex;
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  overflow: hidden;
+}
+
+.segment {
+  display: flex;
+}
+
+/* The radio itself is removed from view but NOT from the accessibility tree or the tab order —
+   this is a real radiogroup, so arrow keys work and a screen reader announces it as one. */
+.radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmentLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.5rem;
+  min-height: var(--size-touch-target);
+  padding-inline: var(--space-3);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+/* Selection is marked by weight and surface, not by the accent. Two accent-coloured things on one
+   screen means one of them is wrong, and the accent belongs to the primary action. */
+.radio:checked + .segmentLabel {
+  background: var(--color-bg-inverse);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-semibold);
+}
+
+.radio:focus-visible + .segmentLabel {
+  outline: var(--border-width-thick) solid var(--color-border-focus);
+  outline-offset: -2px;
+}

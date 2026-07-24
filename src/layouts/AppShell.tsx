@@ -5,13 +5,22 @@ import { useTheme, type Theme } from '../theme/useTheme'
 import styles from './AppShell.module.css'
 
 /**
- * Chrome for the authenticated ledger routes.
+ * Chrome for the authenticated routes.
  *
- * Two destinations, and that is the whole of the navigation. A third would imply the app does
- * three things, and it does not — everything else is support for recording a transaction. There
- * is no sidebar, no breadcrumb and no bottom tab bar: at two levels deep the back affordance is
- * the browser's, and on a screen whose purpose is a numeric keypad a permanent tab bar spends
- * thumb-space on navigation nobody needed.
+ * Three destinations. This comment used to say two, and that a third "would imply the app does
+ * three things, and it does not" — which was true while recording was all the app could do. It is
+ * not true now. The app **records** and it **reviews**; accounts are what make both work. Reports
+ * is the second half the entry brief always named and merely deprioritised.
+ *
+ * The rule that survives is the one that mattered: no FOURTH item without making the same
+ * argument again. Sharing, session management and label-tree management are each a real
+ * destination when they land, and each has to earn the space.
+ *
+ * There is still no sidebar, no breadcrumb and no bottom tab bar: at two levels deep the back
+ * affordance is the browser's, and on a screen whose purpose is a numeric keypad a permanent tab
+ * bar spends thumb-space on navigation nobody needed. Three items fit a top bar at 375px; if they
+ * ever stop fitting the answer is shorter labels, not a drawer, which would put a primary job
+ * behind a gesture.
  *
  * Deliberately absent from /setup, which is chrome-free so there is nothing to navigate away to
  * before the Book can work at all.
@@ -33,6 +42,12 @@ export function AppShell() {
           </NavLink>
           <NavLink to="/accounts" className={navLinkClass}>
             Accounts
+          </NavLink>
+          {/* Last, in lifecycle order — set up accounts, record, review — rather than by
+              frequency, which would put Reports second. Appending also leaves the muscle memory
+              of anyone already using the two-item bar intact. */}
+          <NavLink to="/reports" className={navLinkClass}>
+            Reports
           </NavLink>
         </nav>
 

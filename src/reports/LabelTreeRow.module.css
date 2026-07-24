@@ -1,0 +1,90 @@
+.item {
+  list-style: none;
+}
+
+/* Mobile first: name and figure only. At 375px a name, a bar and a figure cannot all be legible,
+   and the figure is the one that must never be compromised — so the bar is the thing that goes.
+   It returns at the tablet breakpoint, where there is room for it. */
+.row {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-2);
+  border-bottom: var(--row-border);
+}
+
+.bar {
+  display: none;
+}
+
+/* The toggle IS the name, so the whole label is the target rather than a 12px triangle. */
+.toggle,
+.leaf {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  text-align: start;
+}
+
+.toggle {
+  cursor: pointer;
+  /* 44px minimum target on touch, achieved by padding the row rather than the glyph. */
+  min-height: var(--size-touch-target);
+}
+
+.leaf {
+  min-height: var(--size-touch-target);
+}
+
+.triangle,
+.triangleSpacer {
+  flex: 0 0 auto;
+  width: 1ch;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.figure {
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+}
+
+.children {
+  margin: 0;
+  padding: 0;
+}
+
+/* Tablet and up (--breakpoint-md, 768px): the bar earns its place.
+   name | bar | figure — the bar takes the slack, so figures stay in a hard right column and align
+   on the decimal down the whole tree regardless of indent depth. */
+@media (min-width: 48rem) {
+  .row {
+    grid-template-columns: minmax(6rem, max-content) 1fr max-content;
+  }
+
+  /* A panel with one row draws no bar, so the row has two children rather than three. Without
+     this the figure would land in the middle 1fr track and sit left-aligned mid-row instead of
+     against the right edge — breaking the decimal column the mono face exists to hold. */
+  .rowNoBars {
+    grid-template-columns: 1fr max-content;
+  }
+
+  .bar {
+    display: block;
+    min-width: 0;
+  }
+}

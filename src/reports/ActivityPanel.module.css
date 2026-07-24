@@ -1,0 +1,93 @@
+.panel {
+  background: var(--panel-bg);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  padding: var(--panel-padding);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.range {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.total {
+  margin: var(--space-2) 0 var(--space-4);
+  font-size: var(--font-size-xl);
+}
+
+.tree {
+  margin: 0;
+  padding: 0;
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+/* Uncategorized sits at the tree's depth 0 but is deliberately not a tree row — no disclosure,
+   no indent, and a quieter name, because it is an absence rather than a thing anyone created. */
+.uncategorized {
+  display: grid;
+  grid-template-columns: 1fr max-content;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--size-touch-target);
+  padding-block: var(--space-2);
+  list-style: none;
+}
+
+/* Below the tablet breakpoint the bar is absent from every row, including this one. */
+.bar {
+  display: none;
+}
+
+/* Tablet and up: match LabelTreeRow's columns exactly, so the bar and the figure land in the same
+   place on this row as on every row above it. A hole in the bar column was the original fault. */
+@media (min-width: 48rem) {
+  .uncategorized {
+    grid-template-columns: minmax(6rem, max-content) 1fr max-content;
+  }
+
+  /* Same reason as .rowNoBars — two children, so two tracks, so the figure stays hard right. */
+  .uncategorizedNoBars {
+    grid-template-columns: 1fr max-content;
+  }
+
+  .bar {
+    display: block;
+    min-width: 0;
+  }
+}
+
+.uncategorizedName {
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.figure {
+  font-size: var(--font-size-base);
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 0;
+  padding-block: var(--space-3);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}

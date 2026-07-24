@@ -1,0 +1,42 @@
+/* Mobile first: one column, everything stacked in reading order — net worth, the boundary, spent,
+   earned, kept. */
+.page {
+  width: 100%;
+  max-width: var(--max-width-content);
+  margin-inline: auto;
+  padding: var(--space-4);
+}
+
+.title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.panels {
+  display: grid;
+  gap: var(--panel-gap);
+  padding-block: var(--space-5);
+}
+
+/* Tablet (--breakpoint-md). Still one column, still capped at --max-width-content — the previous
+   design review found the entry form running full-width at exactly this size, and this page must
+   not repeat it. The cap is inherited from .page, so there is nothing to do but not undo it. */
+
+/* Desktop (--breakpoint-lg, 1024px) — the same width at which the entry surface splits. Spent and
+   Earned sit side by side; the strip and Kept span both. */
+@media (min-width: 64rem) {
+  .page {
+    max-width: var(--max-width-wide);
+    padding: var(--space-6);
+  }
+
+  .panels {
+    grid-template-columns: 1fr 1fr;
+    /* Each panel takes its natural height. Stretched to match, a one-row breakdown left a large
+       empty box beside a four-row one, which on a restrained surface reads as unfinished rather
+       than quiet. */
+    align-items: start;
+  }
+}

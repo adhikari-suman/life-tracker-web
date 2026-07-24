@@ -212,12 +212,18 @@ describe('step 3 — a session with accounts gets the route it asked for', () =>
     await expectSettledAt('/login', '/')
   })
 
-  it('renders the shell with exactly two destinations', async () => {
+  it('renders the shell with exactly three destinations', async () => {
+    // This asserted two until Reports landed. The rule was never "two"; it was that the app does
+    // one thing and the navigation should say so. The app now records AND reviews, so three is
+    // what saying so looks like — and the assertion stays exact, because the value of this test
+    // is that a FOURTH item cannot be added without someone deliberately editing this line and
+    // making the argument again. Sharing, session management and label-tree management are each
+    // waiting to try.
     renderAt('/')
     await settle('/')
     const nav = screen.getByRole('navigation', { name: 'Main' })
     const links = within(nav).getAllByRole('link')
-    expect(links.map((l) => l.textContent)).toEqual(['Ledger', 'Accounts'])
+    expect(links.map((l) => l.textContent)).toEqual(['Ledger', 'Accounts', 'Reports'])
   })
 })
 

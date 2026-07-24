@@ -1,0 +1,17 @@
+/* No rail behind the fill. Rows share a container width so lengths compare directly against each
+   other, and a track would be one more thing on screen earning nothing. */
+.track {
+  width: 100%;
+  height: var(--bar-height);
+}
+
+.fill {
+  height: 100%;
+  min-width: var(--bar-min-width); /* A nonzero amount never renders as nothing. */
+  background: var(--bar-fill);
+  border-radius: var(--bar-radius);
+  transition: var(--bar-transition);
+}
+
+/* The global prefers-reduced-motion block in tokens.css collapses the transition, so a bar
+   appears at its final width immediately rather than growing. Nothing extra is needed here. */

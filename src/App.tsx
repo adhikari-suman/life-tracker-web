@@ -5,6 +5,7 @@ import { LoginPage } from './routes/LoginPage'
 import { LedgerPage } from './routes/LedgerPage'
 import { SetupPage } from './routes/SetupPage'
 import { AccountsPage } from './routes/AccountsPage'
+import { ReportsPage } from './routes/ReportsPage'
 import { TransactionDetailPage } from './routes/TransactionDetailPage'
 import {
   RedirectIfSignedIn,
@@ -21,7 +22,7 @@ import {
 } from './routes/placeholders'
 
 /**
- * The nine routes from the information architecture, and nothing else.
+ * The ten routes from the information architecture, and nothing else.
  *
  * The nesting IS the redirect chain. Every authenticated route sits inside RequireSession, and
  * the ledger routes sit inside RequireAccounts as well, so the order the IA specifies — no
@@ -62,6 +63,7 @@ export default function App() {
           <Route element={<AppShell />}>
             <Route path="/" element={<LedgerPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
             <Route path="/transactions/:id" element={<TransactionDetailPage />} />
           </Route>
         </Route>

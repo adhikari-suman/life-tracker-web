@@ -41,6 +41,14 @@
       A single burnt orange (Braun heritage) marks the primary action and
       focus. It is not a brand colour to be sprinkled. If two things on screen
       are accent-coloured, one of them is wrong.
+
+   4. MAGNITUDE IS LENGTH, NEVER HUE.
+      The reports breakdown encodes "how much" as bar LENGTH in a single
+      neutral tone. There is no categorical palette in this file and there must
+      not be one: a colour per label would need eight-plus hues, which breaks
+      decision 3 outright, fails in greyscale, and fails the same colour-blind
+      readers decision 1 protects. A pie or donut chart is therefore
+      unbuildable from these tokens by design, not by omission.
    ============================================================================= */
 
 :root {
@@ -93,6 +101,19 @@
 
   --color-money-negative: #8C2F17;     /*  7.27:1 — tint for negative balances.
                                               REINFORCEMENT ONLY. See decision 1. */
+
+  --color-bar-fill: #C7C2BA;           /*  1.77:1 on --color-bg-secondary,
+                                              1.70:1 on the canvas. Deliberately
+                                              far BELOW --color-border-strong
+                                              (3.33:1): that value is calibrated
+                                              for a 1px line, and the identical
+                                              contrast spread across a filled
+                                              area reads much heavier. The bar
+                                              is non-text and decorative, so
+                                              1.4.11 does not bind it — the
+                                              figure beside it is the accessible
+                                              content, and the bar is marked
+                                              aria-hidden. */
 
   --color-surface-overlay: rgb(28 27 25 / 0.32);
 
@@ -250,6 +271,50 @@
   --toast-bg: var(--color-bg-inverse);
   --toast-text: var(--color-text-inverse);
   --toast-shadow: var(--shadow-lg);
+
+  /* --- Reports -------------------------------------------------------------
+     The magnitude bar. Decision 3 forbids the accent here: a bar is neither an
+     action nor a focus target, and the accent's whole power comes from being
+     the only thing wearing it. Length carries the meaning; the fill is a
+     neutral mass whose only job is to make length visible. */
+
+  --bar-fill: var(--color-bar-fill);
+  --bar-height: var(--space-2);          /* 8px — a band, not a stripe. Thinner
+                                            reads as a rule; thicker starts
+                                            competing with the figure. */
+  --bar-radius: var(--border-radius-sm);
+  --bar-min-width: 2px;                  /* A NONZERO amount must never render
+                                            as nothing. Without a floor, 0.3% of
+                                            a total is a sub-pixel bar that
+                                            reads as absent — the bar would lie
+                                            by omission on precisely the small
+                                            rows a reader is least likely to
+                                            verify against the figure. */
+  --bar-transition: width var(--duration-normal) var(--easing-out);
+
+  /* Panels and the label tree. */
+  --panel-bg: var(--color-bg-secondary);
+  --panel-border: var(--border-width-thin) solid var(--color-border-primary);
+  --panel-radius: var(--border-radius-md);
+  --panel-padding: var(--space-5);
+  --panel-gap: var(--space-5);
+
+  --tree-indent: var(--space-5);         /* Per level. Labels are capped at
+                                            three levels (ADR-0015), so 72px is
+                                            the deepest indent that can exist. */
+
+  /* The net-worth figure. NOT --font-size-4xl: that size is reserved above for
+     the entry amount field "and nothing else", and that reservation is exactly
+     why the amount field reads as the most important thing in the app. Net
+     worth is the largest figure on its own page. It is not the largest thing in
+     the product, and taking 4xl would quietly demote the one control the whole
+     entry brief was built around. */
+  --net-worth-font-size: var(--font-size-2xl);
+
+  /* Loading placeholders. A well colour, not a shimmer — animated skeletons are
+     decorative motion, which this philosophy excludes. */
+  --skeleton-bg: var(--color-bg-tertiary);
+  --skeleton-radius: var(--border-radius-sm);
 }
 
 /* =============================================================================
@@ -291,6 +356,14 @@
   --color-status-info: #84ADFF;        /*  6.61:1 */
 
   --color-money-negative: #E88B7A;     /*  5.91:1 */
+
+  --color-bar-fill: #4A4740;           /*  1.80:1 on --color-bg-secondary,
+                                              1.97:1 on the canvas — matched to
+                                              the light value's perceived weight
+                                              rather than derived by flipping
+                                              lightness. A bar lifted to dark
+                                              mode's border-strong (4.09:1)
+                                              would glow against near-black. */
 
   --color-surface-overlay: rgb(0 0 0 / 0.6);
 
@@ -336,6 +409,7 @@
     --color-status-info: #84ADFF;
 
     --color-money-negative: #E88B7A;
+    --color-bar-fill: #4A4740;
 
     --color-surface-overlay: rgb(0 0 0 / 0.6);
     --color-selection: rgb(249 115 22 / 0.30);

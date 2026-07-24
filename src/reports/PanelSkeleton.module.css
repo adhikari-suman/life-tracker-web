@@ -1,0 +1,32 @@
+/* Every height below matches the real element it stands in for, so the panel is the same size
+   before and after the response lands. */
+
+.total {
+  height: var(--font-size-xl);
+  width: 8rem;
+  margin: var(--space-2) 0 var(--space-4);
+  background: var(--skeleton-bg);
+  border-radius: var(--skeleton-radius);
+}
+
+.rows {
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.row {
+  height: var(--size-touch-target);
+  border-bottom: var(--row-border);
+}
+
+.row::after {
+  content: '';
+  display: block;
+  height: var(--font-size-base);
+  width: 60%;
+  margin-block: var(--space-3);
+  background: var(--skeleton-bg);
+  border-radius: var(--skeleton-radius);
+}
+
+.row:nth-child(2)::after { width: 45%; }
+.row:nth-child(3)::after { width: 30%; }

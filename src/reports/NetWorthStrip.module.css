@@ -1,0 +1,63 @@
+/* Deliberately NOT a panel. No card background, no border box — it is set on the page canvas so
+   it reads as belonging to the page rather than to the range control below it. That difference is
+   what tells the reader it is not governed by the picker, before any label is read. */
+.strip {
+  padding-block: var(--space-2) var(--space-5);
+}
+
+.labels {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.asOf {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+
+.figure {
+  list-style: none;
+}
+
+/* --net-worth-font-size is 2xl, NOT 4xl. The token file reserves 4xl for the entry amount field
+   "and nothing else", and that reservation is why the amount field reads as the most important
+   thing in the app. This is the largest figure on its own page — not the largest in the product. */
+.amount {
+  font-size: var(--net-worth-font-size);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.placeholder {
+  height: var(--net-worth-font-size);
+  width: 12rem;
+  margin-top: var(--space-3);
+  background: var(--skeleton-bg);
+  border-radius: var(--skeleton-radius);
+}
+
+.none {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

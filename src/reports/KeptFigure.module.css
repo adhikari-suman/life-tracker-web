@@ -1,0 +1,23 @@
+/* Set on the canvas rather than in a panel, and below both figures it derives from, so it reads
+   as a consequence of them rather than a fourth independent measurement. */
+.kept {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-top: var(--border-width-thin) solid var(--color-border-subtle);
+}
+
+.heading {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.amount {
+  font-size: var(--font-size-lg);
+}
