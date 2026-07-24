@@ -1,0 +1,153 @@
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.optional {
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  text-transform: none;
+  color: var(--color-text-tertiary);
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+
+  min-height: var(--field-height);
+  padding: 0 var(--space-3);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-bg);
+
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  text-align: start;
+  cursor: pointer;
+}
+
+.trigger:focus-visible {
+  border-color: var(--color-border-focus);
+}
+
+.value {
+  color: var(--color-text-primary);
+}
+
+.placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.caret {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-inline: 4px solid transparent;
+  border-top: 5px solid var(--color-text-secondary);
+}
+
+/* The dropdown is one of the few genuinely floating things — reserved shadow territory. */
+.panel {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  inset-inline: 0;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: var(--border-width-thin) solid var(--color-border-primary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+.filter {
+  min-height: var(--field-height);
+  padding: 0 var(--space-3);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+}
+
+.filter:focus-visible {
+  border-color: var(--color-border-focus);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  /* Caps the panel height so a large tree scrolls rather than covering the form. */
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.option {
+  display: block;
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  text-align: start;
+  cursor: pointer;
+}
+
+.option:hover,
+.option:focus-visible {
+  background: var(--color-bg-tertiary);
+}
+
+.option[aria-selected='true'] {
+  font-weight: var(--font-weight-medium);
+  background: var(--color-bg-tertiary);
+}
+
+/* The one place the accent appears in the picker: creating a label is the constructive action. */
+.create {
+  display: block;
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  color: var(--color-accent-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  text-align: start;
+  cursor: pointer;
+}
+
+.create:hover,
+.create:focus-visible {
+  background: var(--color-bg-tertiary);
+}
+
+.emptyNote {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}

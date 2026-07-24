@@ -19,6 +19,12 @@ vi.mock('../api/generated/sdk.gen', () => ({
   listAccounts: vi.fn(),
   login: vi.fn(),
   logout: vi.fn(),
+  // The ledger route (rendered when the guard lets a session through) fetches these on mount.
+  // Empty responses are enough — this suite is about routing, not the ledger's contents.
+  listLabels: vi.fn().mockResolvedValue({ data: [], response: new Response(null, { status: 200 }) }),
+  listTransactions: vi.fn().mockResolvedValue({ data: [], response: new Response(null, { status: 200 }) }),
+  recordTransaction: vi.fn(),
+  createLabel: vi.fn(),
 }))
 
 const { getMe, listAccounts, login, logout } = await import('../api/generated/sdk.gen')

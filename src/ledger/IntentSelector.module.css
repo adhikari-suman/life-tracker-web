@@ -1,0 +1,55 @@
+/* A pill-shaped segmented control — the one place the tokens reserve --border-radius-full for.
+   Four equal segments so the options read as siblings of equal weight, none pre-favoured. */
+
+.group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1);
+
+  padding: var(--space-1);
+  border: var(--border-width-thin) solid var(--color-border-strong);
+  border-radius: var(--intent-selector-radius);
+  background: var(--color-bg-tertiary);
+}
+
+.option {
+  min-height: var(--intent-selector-height);
+  padding: 0 var(--space-2);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--border-radius-full);
+  background: transparent;
+
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+
+  transition:
+    background-color var(--duration-fast) var(--easing-default),
+    color var(--duration-fast) var(--easing-default);
+}
+
+.option:hover:not(.selected) {
+  color: var(--color-text-primary);
+}
+
+/* The chosen segment is marked by a raised surface and full-contrast text, not by the accent —
+   the accent is spent on the Record button, the primary action. Weight and elevation carry the
+   selection, so it reads in greyscale too. */
+.selected {
+  background: var(--color-bg-secondary);
+  border-color: var(--color-border-primary);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+/* On the narrowest screens the four labels can crowd; let them shrink a touch rather than wrap,
+   since a wrapped segment breaks the single-row rhythm the control depends on. */
+@media (max-width: 360px) {
+  .option {
+    font-size: var(--font-size-sm);
+    padding-inline: var(--space-1);
+  }
+}

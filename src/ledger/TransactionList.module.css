@@ -1,0 +1,30 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.heading {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.note {
+  margin: 0;
+  padding: var(--space-4) var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* The windowed region. A bounded height turns the whole history into a scroll rather than a page
+   that grows without limit. On desktop the panel governs the height; here it caps it. */
+.scroll {
+  overflow-y: auto;
+  /* Room for a good few rows without dominating the mobile viewport; the desktop layout lets it
+     fill the column instead (see the ledger page). */
+  max-height: 60vh;
+}

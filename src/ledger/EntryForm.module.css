@@ -1,0 +1,52 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Two pickers side by side once there is room, stacked on the narrowest screens. The source and
+   destination read as a pair — money from here, to there — so they belong on one line when they
+   fit. */
+.accounts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 480px) {
+  .accounts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.error {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-status-error);
+}
+
+.submit {
+  min-height: calc(var(--size-touch-target) + var(--space-1));
+  padding: var(--space-2) var(--space-5);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--border-radius-md);
+
+  /* The single accent, on the single primary action — the one Record button. */
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+
+  transition: background-color var(--duration-fast) var(--easing-default);
+}
+
+.submit:hover {
+  background: var(--color-accent-primary-hover);
+}
+
+.submit:active {
+  background: var(--color-accent-primary-active);
+}

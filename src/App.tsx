@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router'
 import { AppShell } from './layouts/AppShell'
 import { AuthLayout } from './layouts/AuthLayout'
 import { LoginPage } from './routes/LoginPage'
+import { LedgerPage } from './routes/LedgerPage'
 import {
   RedirectIfSignedIn,
   RequireAccounts,
@@ -11,7 +12,6 @@ import {
 import {
   AccountsPage,
   ForgotPasswordPage,
-  LedgerPage,
   NotFoundPage,
   RegisterPage,
   ResetPasswordPage,

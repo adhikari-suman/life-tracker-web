@@ -1,0 +1,38 @@
+/* Single column on mobile: the form, then the recent list below the fold. From 1024px the two
+   sit side by side and entry becomes a persistent panel rather than a route — the behavioural
+   change the brief calls for, not just a reflow. The form column is capped so the amount field
+   does not stretch to an unusable width on a large screen. */
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, var(--max-width-form)) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.recent {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .recent {
+    /* Stick alongside the form so a long history scrolls within its own column rather than
+       pushing the page. */
+    position: sticky;
+    top: var(--space-5);
+  }
+}

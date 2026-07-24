@@ -86,3 +86,29 @@
   font-size: var(--font-size-sm);
   color: var(--color-status-error);
 }
+
+/* --- hero: the entry form's primary amount ------------------------------------------------
+   The largest element in the app, because it is the most important. Everything else on the
+   ledger screen is sized in relation to this. */
+
+.hero .wrapper {
+  /* Taller than the touch-target floor — this is not just tappable, it is the focal point. */
+  min-height: calc(var(--size-touch-target) + var(--space-4));
+  padding-inline: var(--space-4);
+}
+
+.hero .input {
+  font-size: var(--amount-field-font-size);
+  line-height: var(--line-height-tight);
+  /* The placeholder shows the shape of what to type, at the same scale, so the field does not
+     collapse in height when empty. */
+}
+
+.hero .currency {
+  /* Holds its own against a 48px figure without competing with it. */
+  font-size: var(--font-size-lg);
+}
+
+.hero .label {
+  font-size: var(--font-size-sm);
+}

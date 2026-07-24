@@ -20,15 +20,6 @@ function Placeholder({ title, task, children }: { title: string; task: string; c
 
 /* -------------------------------------------------------------------------- authenticated -- */
 
-export function LedgerPage() {
-  return (
-    <Placeholder
-      title="Ledger"
-      task="the entry form is the intent selector, amount field and account pickers; the list is the transaction list task"
-    />
-  )
-}
-
 export function AccountsPage() {
   return (
     <Placeholder

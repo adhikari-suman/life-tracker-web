@@ -20,6 +20,12 @@ type AmountInputProps = Omit<
   currency: string
   label: string
   error?: string | null
+  /**
+   * `hero` is the entry form's primary amount — the largest thing in the app, at
+   * --font-size-4xl. `default` is every other amount input (the cross-currency second figure,
+   * an opening balance in setup). The string handling is identical; only the scale differs.
+   */
+  variant?: 'default' | 'hero'
 }
 
 export function AmountInput({
@@ -28,15 +34,17 @@ export function AmountInput({
   currency,
   label,
   error = null,
+  variant = 'default',
   id,
   ...inputProps
 }: AmountInputProps) {
   const generatedId = useId()
   const fieldId = id ?? generatedId
   const errorId = `${fieldId}-error`
+  const fieldClass = variant === 'hero' ? `${styles.field} ${styles.hero}` : styles.field
 
   return (
-    <div className={styles.field}>
+    <div className={fieldClass}>
       <label className={styles.label} htmlFor={fieldId}>
         {label}
         {/* The brief requires the accessible name to carry the currency: a screen reader must
