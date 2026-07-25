@@ -58,6 +58,46 @@
   cursor: progress;
 }
 
+/* --- outcome screens ---------------------------------------------------------------------
+   The password-reset and verification flows end on a statement rather than a form: "check your
+   email", "password changed", "could not verify that link". Same column and rhythm as the form,
+   so the page does not appear to jump when one replaces the other. */
+
+.outcome {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.note {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  /* Explanatory prose, not a form label — keep it to a comfortable measure. */
+  max-width: 40ch;
+}
+
+/* A button that reads as a link, for an action sitting mid-sentence ("try again", "send me a new
+   link"). It is a real <button> because it performs an action rather than navigating — a link
+   that does not go anywhere is a lie to anyone using a screen reader or middle-clicking it. */
+.inlineButton {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--color-text-link);
+  text-decoration: underline;
+  text-decoration-thickness: var(--border-width-thin);
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.inlineButton[aria-disabled='true'] {
+  color: var(--color-text-tertiary);
+  cursor: progress;
+}
+
 /* --- footer ------------------------------------------------------------------------------ */
 
 .links {

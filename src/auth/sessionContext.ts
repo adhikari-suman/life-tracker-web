@@ -20,6 +20,12 @@ export type SessionContextValue = {
   establish: (tokens: TokenResponse) => Promise<void>
   /** Re-read accounts. Called by /setup, which changes the answer to the guard's second step. */
   refreshAccounts: () => Promise<void>
+  /**
+   * Re-read the User. Called by /verify-email, which changes `emailVerified` — the shell shows a
+   * marker keyed off it, and leaving that stale would tell someone who just verified that they
+   * had not.
+   */
+  refreshUser: () => Promise<void>
   /** Revoke the Session server-side, then drop the local tokens. */
   signOut: () => Promise<void>
 }

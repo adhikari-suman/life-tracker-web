@@ -14,12 +14,10 @@ import {
   RequireSetupPending,
 } from './routes/guards'
 import { RegisterPage } from './routes/RegisterPage'
-import {
-  ForgotPasswordPage,
-  NotFoundPage,
-  ResetPasswordPage,
-  VerifyEmailPage,
-} from './routes/placeholders'
+import { ForgotPasswordPage } from './routes/ForgotPasswordPage'
+import { ResetPasswordPage } from './routes/ResetPasswordPage'
+import { VerifyEmailPage } from './routes/VerifyEmailPage'
+import { NotFoundPage } from './routes/NotFoundPage'
 
 /**
  * The ten routes from the information architecture, and nothing else.

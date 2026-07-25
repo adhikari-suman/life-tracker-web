@@ -71,6 +71,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const refreshUser = useCallback(async () => {
+    const me = await getMe()
+    setState((current) =>
+      current.status === 'authenticated' && me.data !== undefined
+        ? { ...current, user: me.data }
+        : current,
+    )
+  }, [])
+
   const signOut = useCallback(async () => {
     // Server first, so the Session is actually revoked rather than merely forgotten here. The
     // result is not checked: if it fails the local tokens must still go, and a client that
@@ -81,8 +90,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const value = useMemo(
-    () => ({ state, establish, refreshAccounts, signOut }),
-    [state, establish, refreshAccounts, signOut],
+    () => ({ state, establish, refreshAccounts, refreshUser, signOut }),
+    [state, establish, refreshAccounts, refreshUser, signOut],
   )
 
   return <SessionContext value={value}>{children}</SessionContext>
