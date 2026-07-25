@@ -64,9 +64,14 @@ export function RegisterPage() {
             ? `Use at least ${MIN_PASSWORD_LENGTH} characters.`
             : null,
       // Not a field the API knows about — the spec's RegisterRequest has no confirmation, and
-      // this one never leaves the browser. It is here because a mistyped password on THIS form is
-      // currently unrecoverable: /forgot-password is still a placeholder, so there is no reset
-      // path to fall back on. Delete this field the day password reset is built, not before.
+      // this one never leaves the browser.
+      //
+      // It was added when a mistyped password here was unrecoverable, because /forgot-password was
+      // still a placeholder, and the comment used to say to delete it the day reset was built.
+      // Reset is now built and the field STAYS — a deliberate decision, recorded here so nobody
+      // removes it on the strength of an instruction that is no longer the plan. Catching the typo
+      // at the keystroke is better than recovering from it later, and recovery currently means
+      // finding a token in a server log.
       confirm: confirm !== password ? 'Both passwords must match.' : null,
     }
     setFieldErrors(nextErrors)
