@@ -152,9 +152,27 @@ export function useCommitQueue({ undoWindowMs, onCommitted }: UseCommitQueueOpti
   // pending, immediately, rather than warn or drop it. keepalive lets the request outlive an
   // unloading document.
   //
-  // Both hooks share one `flush`. The unmount case is safe under React StrictMode's dev
-  // double-invoke: that throwaway unmount happens right after the initial mount, when nothing has
-  // been submitted and there is nothing to flush.
+  // Flush pending entries when the PAGE goes away — a closed tab or a real navigation, where the
+  // setTimeout that would have committed them dies with the document. keepalive is what lets the
+  // request outlive it.
+  //
+  // This deliberately does NOT flush on React unmount, and that is a bug fix rather than an
+  // omission. It used to, on the stated reasoning that StrictMode's dev double-invoke unmounts
+  // "when nothing has been submitted and there is nothing to flush". That is true for a normal
+  // visit — and false for the one flow that submits DURING mount: a reversal, which arrives as
+  // router state and is staged from an effect in LedgerPage.
+  //
+  // The result was every symptom of the undo window being broken, from this one line. The
+  // throwaway unmount fired with the reversal pending, flush posted it instantly — so a ten-second
+  // window committed in milliseconds — and emptied pendingRequests. The remount then showed a
+  // countdown for a request that no longer existed: doCommit found nothing and returned early, so
+  // the row never moved to "Saving…" and sat at "0s to undo" with a live Cancel that silently did
+  // nothing, because cancel had nothing left to cancel. Only reversals were affected; a typed
+  // entry is submitted after mount has settled, so no unmount ever intervened.
+  //
+  // Nothing is lost by not flushing here. A pending entry's setTimeout is a real timer that still
+  // fires after the component goes, and doCommit reads the refs rather than state, so an entry
+  // staged before you navigated to /accounts still commits on its original schedule.
   useEffect(() => {
     function flush() {
       for (const [id, request] of pendingRequests.current) {
@@ -171,7 +189,6 @@ export function useCommitQueue({ undoWindowMs, onCommitted }: UseCommitQueueOpti
     window.addEventListener('pagehide', flush)
     return () => {
       window.removeEventListener('pagehide', flush)
-      flush()
     }
   }, [])
 

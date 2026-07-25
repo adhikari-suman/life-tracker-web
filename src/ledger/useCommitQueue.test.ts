@@ -28,6 +28,40 @@ afterEach(() => {
 })
 
 describe('the undo commit queue', () => {
+  it('does NOT flush pending entries when the component unmounts', async () => {
+    // The regression that broke reversal. This effect used to flush on unmount as well as on
+    // pagehide, reasoning that StrictMode's throwaway unmount happens "when nothing has been
+    // submitted". That is true for a typed entry and FALSE for a reversal, which LedgerPage
+    // stages from an effect DURING mount — so the throwaway unmount posted it instantly, a
+    // ten-second window committed in milliseconds, and the remounted row counted down against a
+    // request that no longer existed: stuck at "0s to undo", Cancel present and inert.
+    const { result, unmount } = renderHook(() => useCommitQueue({ undoWindowMs: 5000 }))
+
+    act(() => result.current.submit(REQUEST))
+    expect(recordTransaction).not.toHaveBeenCalled()
+
+    unmount()
+
+    // The entry is still HELD. Unmounting is not consent to commit.
+    expect(recordTransaction).not.toHaveBeenCalled()
+  })
+
+  it('still commits on its original schedule after unmount, so nothing is lost', async () => {
+    // The other half of the bargain: not flushing must not mean dropping. The timer is a real
+    // one and doCommit reads refs rather than state, so an entry staged before navigating away
+    // commits when it always would have.
+    const { result, unmount } = renderHook(() => useCommitQueue({ undoWindowMs: 5000 }))
+
+    act(() => result.current.submit(REQUEST))
+    unmount()
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000)
+    })
+    expect(recordTransaction).toHaveBeenCalledTimes(1)
+    expect(recordTransaction).toHaveBeenCalledWith({ body: REQUEST })
+  })
+
   it('holds the POST until the window elapses — nothing is sent during it', async () => {
     const { result } = renderHook(() => useCommitQueue({ undoWindowMs: 5000 }))
 
