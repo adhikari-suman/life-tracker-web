@@ -1,0 +1,139 @@
+.item {
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-height: var(--size-touch-target);
+  padding-block: var(--space-2);
+  border-bottom: var(--row-border);
+}
+
+/* Retired, not deleted. Dimmed rather than struck through — history still reports under it, so it
+   is not wrong, just no longer offered. */
+.archivedRow .name {
+  color: var(--color-text-tertiary);
+}
+
+.name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: var(--font-size-base);
+}
+
+.badge {
+  padding: 0 var(--space-2);
+  border: var(--border-width-thin) solid var(--color-border-primary);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* Text buttons, not filled ones. Five filled buttons per row would put five competing weights on
+   every line; the accent stays reserved for the page's one primary action. */
+.action {
+  min-height: var(--size-touch-target);
+  padding-inline: var(--space-2);
+  border: 0;
+  background: none;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-sm);
+}
+
+.action:hover:not([aria-disabled='true']) {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+}
+
+.action[aria-disabled='true'] {
+  color: var(--color-text-tertiary);
+  cursor: progress;
+}
+
+.confirm {
+  min-height: var(--size-touch-target);
+  padding-inline: var(--space-4);
+  border: var(--field-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-bg-secondary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.inlineForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.input {
+  flex: 1 1 12rem;
+  min-height: var(--field-height);
+  padding-inline: var(--space-3);
+  background: var(--field-bg);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+/* The expanded move / add-child area, indented one level so it reads as belonging to its row. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+  border-bottom: var(--row-border);
+}
+
+.panelLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.select {
+  max-width: 24rem;
+  min-height: var(--field-height);
+  padding-inline: var(--space-3);
+  background: var(--field-bg);
+  border: var(--field-border);
+  border-radius: var(--field-radius);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+}
+
+.hint {
+  margin: 0;
+  max-width: 48ch;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.children {
+  margin: 0;
+  padding: 0;
+}

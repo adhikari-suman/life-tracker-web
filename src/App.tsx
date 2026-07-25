@@ -6,6 +6,7 @@ import { LedgerPage } from './routes/LedgerPage'
 import { SetupPage } from './routes/SetupPage'
 import { AccountsPage } from './routes/AccountsPage'
 import { ReportsPage } from './routes/ReportsPage'
+import { LabelsPage } from './routes/LabelsPage'
 import { TransactionDetailPage } from './routes/TransactionDetailPage'
 import {
   RedirectIfSignedIn,
@@ -20,7 +21,10 @@ import { VerifyEmailPage } from './routes/VerifyEmailPage'
 import { NotFoundPage } from './routes/NotFoundPage'
 
 /**
- * The ten routes from the information architecture, and nothing else.
+ * The eleven routes from the information architecture, and nothing else.
+ *
+ * /labels is reachable from the Profile menu rather than the nav: the nav names what the app
+ * DOES, and labels are configuration. See the note on ProfileMenu in AppShell.
  *
  * The nesting IS the redirect chain. Every authenticated route sits inside RequireSession, and
  * the ledger routes sit inside RequireAccounts as well, so the order the IA specifies — no
@@ -62,6 +66,7 @@ export default function App() {
             <Route path="/" element={<LedgerPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/labels" element={<LabelsPage />} />
             <Route path="/transactions/:id" element={<TransactionDetailPage />} />
           </Route>
         </Route>

@@ -220,3 +220,21 @@
     padding-inline: var(--space-5);
   }
 }
+
+/* A destination inside the utility menu. Styled like the sign-out row rather than like a link in
+   prose: it is a menu item, and a blue underlined link in a menu reads as out of place. */
+.menuLink {
+  display: block;
+  width: 100%;
+  min-height: var(--size-touch-target);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  line-height: var(--size-touch-target);
+}
+
+.menuLink:hover {
+  background: var(--color-bg-tertiary);
+}

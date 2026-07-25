@@ -13,8 +13,10 @@ import styles from './AppShell.module.css'
  * is the second half the entry brief always named and merely deprioritised.
  *
  * The rule that survives is the one that mattered: no FOURTH item without making the same
- * argument again. Sharing, session management and label-tree management are each a real
- * destination when they land, and each has to earn the space.
+ * argument again. Label-tree management was the first to test it and did NOT take a nav item — it
+ * sits in the Profile menu below, because the nav names what the app does and a label tree is
+ * configuration. Sharing and session management are still to come and each has to earn the space
+ * the same way.
  *
  * There is still no sidebar, no breadcrumb and no bottom tab bar: at two levels deep the back
  * affordance is the browser's, and on a screen whose purpose is a numeric keypad a permanent tab
@@ -145,6 +147,17 @@ function ProfileMenu() {
           {!state.user.emailVerified && (
             <p className={styles.unverified}>Email not verified</p>
           )}
+
+          <hr className={styles.menuRule} />
+
+          {/* Labels live here rather than in the nav. The nav names what the app DOES — record,
+              review, and the accounts both rest on — and a label tree is configuration, tended
+              occasionally rather than visited daily. Putting it here is what keeps the "no fourth
+              nav item without making the argument again" rule from being broken by the very next
+              feature that wanted one. */}
+          <NavLink to="/labels" className={styles.menuLink} role="menuitem" onClick={() => setOpen(false)}>
+            Labels
+          </NavLink>
 
           <hr className={styles.menuRule} />
 
