@@ -47,6 +47,10 @@ function optimisticTransaction(id: string, request: RecordTransactionRequest): T
   return {
     id,
     date: request.date,
+    // The request's own reading, never a fresh one: the pending row must render identically to the
+    // committed one it is replaced by, and it now sits under a day heading that a different date
+    // would move it out of.
+    time: request.time,
     exchangeRate: null,
     postings: [
       { id: `${id}-from`, accountId: request.from, direction: 'CREDIT', amount: request.amount },
