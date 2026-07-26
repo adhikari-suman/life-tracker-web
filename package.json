@@ -1,7 +1,7 @@
 {
   "name": "life-tracker-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.8.2",
   "type": "module",
   "scripts": {
     "codegen": "openapi-ts",
