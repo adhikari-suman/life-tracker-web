@@ -37,10 +37,16 @@ jobs:
           ref: ${{ github.base_ref || github.ref_name }}
           path: life-tracker-contracts
 
+      # Through env rather than interpolated straight into the script: a ${{ }} expansion inside a
+      # run block is substituted as raw text before bash sees it, and a git ref may legally contain
+      # $ ( ) & | < > and quotes. Restricted triggers make it safe here; passing it as an
+      # environment variable makes it safe regardless.
       - name: which spec are we building against
         working-directory: life-tracker-contracts
+        env:
+          SPEC_REF: ${{ github.base_ref || github.ref_name }}
         run: |
-          echo "ref:     ${{ github.base_ref || github.ref_name }}"
+          echo "ref:     $SPEC_REF"
           echo "commit:  $(git rev-parse --short HEAD)"
           echo "version: $(grep -m1 '^  version:' openapi.yaml | awk '{print $2}')"
 
@@ -50,9 +56,12 @@ jobs:
           cache: npm
           cache-dependency-path: life-tracker-web/package-lock.json
 
+      # --ignore-scripts: a dependency's postinstall runs with the job's token and network, so it
+      # is the cheapest supply-chain foothold there is. Nothing here needs one — verified by
+      # installing this way and building clean.
       - name: install
         working-directory: life-tracker-web
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       # Runs codegen first (via the script), so this fails the moment the hand-written code stops
       # matching the generated types — which is exactly how the ADR-0018 drift showed up: ten
