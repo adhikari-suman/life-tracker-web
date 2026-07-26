@@ -29,6 +29,18 @@
   }
 }
 
+/* A day heading. Quiet and secondary — it is a divider that happens to be legible, not a title
+   competing with the rows under it. The height is fixed and matched by DAY_HEIGHT in the
+   component, because the windowing prefix-sums these to find the visible slice. */
+.day {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-tertiary);
+}
+
 /* The windowed region. A bounded height turns the whole history into a scroll rather than a page
    that grows without limit. On desktop the panel governs the height; here it caps it. */
 .scroll {

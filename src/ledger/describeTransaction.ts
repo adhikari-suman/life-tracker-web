@@ -109,13 +109,15 @@ export function accountsById(accounts: readonly Account[]): Map<string, Account>
 /**
  * Compose the mirror of a transaction: money flows the other way. `from` and `to` swap, each
  * posting's real amount is carried in its own currency (so a cross-currency reversal never
- * multiplies by a rate), and the date is TODAY — the reversal is a new event in an append-only
- * ledger, not a rewrite of the original, which stays in history. The result is a request for the
- * caller to stage for review, never to post silently.
+ * multiplies by a rate), and the date and time are NOW — the reversal is a new event in an
+ * append-only ledger, not a rewrite of the original, which stays in history. Carrying the
+ * original's clock reading would date a Friday reversal with Tuesday's time. The result is a
+ * request for the caller to stage for review, never to post silently.
  */
 export function reverseRequest(
   transaction: Transaction,
   date: string,
+  time: string,
 ): RecordTransactionRequest {
   const credit = transaction.postings.find((p) => p.direction === 'CREDIT') ?? transaction.postings[0]
   const debit = transaction.postings.find((p) => p.direction === 'DEBIT') ?? transaction.postings[1]
@@ -124,6 +126,7 @@ export function reverseRequest(
   const crossCurrency = credit.amount.currency !== debit.amount.currency
   return {
     date,
+    time,
     from: debit.accountId,
     to: credit.accountId,
     amount: debit.amount,

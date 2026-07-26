@@ -6,8 +6,9 @@ import { intentSpec, type Intent } from './intents'
 import { IntentSelector } from './IntentSelector'
 import { AccountPicker } from './AccountPicker'
 import { LabelPicker } from './LabelPicker'
-import { DateField } from './DateField'
-import { emptyDraft, type EntryDraft } from './entryDraft'
+import { WhenField } from './WhenField'
+import { emptyDraft, requestTime, type EntryDraft } from './entryDraft'
+import { nowHHmm, todayISO } from './clock'
 import styles from './EntryForm.module.css'
 
 // The entry itself. Intent first, then amount, then the two accounts, then optionally a label —
@@ -72,6 +73,20 @@ export function EntryForm({ accounts, labels, onCreateLabel, onSubmit, initialDr
     setError(null)
   }
 
+  function changeDate(date: string) {
+    setDraft((d) => {
+      // Back to today and the time field disappears (WhenField), so anything typed while backdated
+      // would linger invisibly and be sent unseen. Re-seed from the clock and forget it was touched
+      // — the field is hidden precisely because "now" is trustworthy again.
+      if (date === todayISO()) return { ...d, date, time: nowHHmm(), timeTouched: false }
+      return { ...d, date }
+    })
+  }
+
+  function changeTime(time: string) {
+    setDraft((d) => ({ ...d, time, timeTouched: true }))
+  }
+
   function handleSubmit() {
     // Client-side validation is presence and shape only; the server owns the domain rules and
     // answers with a Problem the queue surfaces. This just avoids queuing an entry that cannot
@@ -99,6 +114,7 @@ export function EntryForm({ accounts, labels, onCreateLabel, onSubmit, initialDr
     // a Money, so it stays the gate.
     const request: RecordTransactionRequest = {
       date: draft.date,
+      time: requestTime(draft),
       from: draft.fromId,
       to: draft.toId,
       amount: toMoney(draft.amount, fromAccount!.currency),
@@ -108,9 +124,18 @@ export function EntryForm({ accounts, labels, onCreateLabel, onSubmit, initialDr
 
     onSubmit(request)
 
-    // Reset for the next entry, keeping the intent — a catch-up session is usually many of the
-    // same kind. Focus returns to the amount so the next one begins with typing.
-    setDraft((d) => ({ ...emptyDraft(), intent: d.intent }))
+    // Reset for the next entry, keeping the intent AND when it happened — a catch-up session is
+    // usually many of the same kind, from the same evening. Snapping the date back to today would
+    // make you re-pick it (and re-enter the time, which reappears with it) on every single row of
+    // the flow this form exists for. A fresh page load still starts at today, so a stale date
+    // cannot outlive the session. Focus returns to the amount so the next one begins with typing.
+    setDraft((d) => ({
+      ...emptyDraft(),
+      intent: d.intent,
+      date: d.date,
+      time: d.time,
+      timeTouched: d.timeTouched,
+    }))
     setError(null)
     amountRef.current?.focus()
   }
@@ -175,7 +200,7 @@ export function EntryForm({ accounts, labels, onCreateLabel, onSubmit, initialDr
         />
       )}
 
-      <DateField value={draft.date} onChange={(date) => setDraft((d) => ({ ...d, date }))} />
+      <WhenField date={draft.date} time={draft.time} onDateChange={changeDate} onTimeChange={changeTime} />
 
       {error !== null && (
         <p className={styles.error} role="alert">

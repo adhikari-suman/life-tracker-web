@@ -23,6 +23,7 @@ function txn(fromId: string, toId: string, amount: string, toAmount?: string): T
   return {
     id: 't1',
     date: '2026-07-24',
+    time: '19:42',
     exchangeRate: toAmount ? '0.9' : null,
     postings: [
       { id: 'p-from', accountId: fromId, direction: 'CREDIT', amount: { amount, currency: fromCur } },
@@ -125,7 +126,7 @@ describe('reverseRequest composes the mirror movement', () => {
   it('swaps from and to, dates it today, and keeps the same amount for a same-currency txn', () => {
     // Original: Spent 12.00 from bank on groceries.
     const original = txn('bank', 'groceries', '12.00')
-    const mirror = reverseRequest(original, '2026-07-24')
+    const mirror = reverseRequest(original, '2026-07-24', '08:15')
     // Reverse: money leaves groceries (the old destination) and returns to bank (the old source).
     expect(mirror.from).toBe('groceries')
     expect(mirror.to).toBe('bank')
@@ -134,10 +135,18 @@ describe('reverseRequest composes the mirror movement', () => {
     expect(mirror.toAmount).toBeUndefined()
   })
 
+  it('stamps NOW rather than carrying the original clock reading', () => {
+    // The original happened at 19:42; the reversal is a new event, today at 08:15. Carrying 19:42
+    // across would date a morning reversal with the original evening's time.
+    const original = txn('bank', 'groceries', '12.00')
+    expect(original.time).toBe('19:42')
+    expect(reverseRequest(original, '2026-07-26', '08:15').time).toBe('08:15')
+  })
+
   it('carries both real figures for a cross-currency reversal, never a rate', () => {
     // Original: Moved USD 100 that arrived as EUR 90.
     const original = txn('bank', 'eur', '100.00', '90.00')
-    const mirror = reverseRequest(original, '2026-07-24')
+    const mirror = reverseRequest(original, '2026-07-24', '08:15')
     // Now money leaves the euro account (90 EUR) and returns to the dollar account (100 USD).
     expect(mirror.from).toBe('eur')
     expect(mirror.to).toBe('bank')

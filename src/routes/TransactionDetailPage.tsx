@@ -10,7 +10,7 @@ import { FullPageWait } from '../components/FullPageWait'
 import { accountsById, describeTransaction, reverseRequest } from '../ledger/describeTransaction'
 import { LabelPicker } from '../ledger/LabelPicker'
 import { useLabels } from '../ledger/useLabels'
-import { todayISO } from '../ledger/todayISO'
+import { nowHHmm, todayISO } from '../ledger/clock'
 import styles from './TransactionDetailPage.module.css'
 
 // What happened, in the intent's language, reconstructed from the postings — never debits and
@@ -94,7 +94,7 @@ export function TransactionDetailPage() {
     // Compose the mirror and hand it to the ledger to stage in the undo queue — the app's own
     // review mechanism. It lands as a pending row with a countdown and Cancel rather than posting
     // silently, and the original stays in history either way (the ledger being honest).
-    void navigate('/', { state: { reverse: reverseRequest(transaction, todayISO()) } })
+    void navigate('/', { state: { reverse: reverseRequest(transaction, todayISO(), nowHHmm()) } })
   }
 
   return (
@@ -126,6 +126,14 @@ export function TransactionDetailPage() {
         <div className={styles.fact}>
           <dt className={styles.factLabel}>Date</dt>
           <dd className={styles.factValue}>{transaction.date}</dd>
+        </div>
+        {/* The wall-clock reading, shown here and nowhere else. The list groups by day and stays
+            silent on the time — it orders a day and does nothing else (ADR-0018) — but a time the
+            user typed on a backdated entry has to be checkable somewhere, or the field that
+            collected it is write-only. */}
+        <div className={styles.fact}>
+          <dt className={styles.factLabel}>Time</dt>
+          <dd className={styles.factValue}>{transaction.time}</dd>
         </div>
         {d.crossCurrency && d.exchangeRate !== null && (
           <div className={styles.fact}>

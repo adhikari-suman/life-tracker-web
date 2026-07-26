@@ -1,17 +1,41 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Account, Label, Transaction } from '../api/generated/types.gen'
 import { NETWORK_FAILURE, problemMessage, type AppProblem } from '../api/problem'
 import type { CommitEntry } from './useCommitQueue'
 import { TransactionRow } from './TransactionRow'
+import { groupByDay, dayHeading, type DayItem } from './groupByDay'
+import { todayISO } from './clock'
 import styles from './TransactionList.module.css'
 
-// The confirmation that entry worked, newest first. Two regions: the few queue entries (pending,
-// committing, failed) rendered directly at the top, and the committed history below, windowed so
-// the DOM stays flat no matter how long the payload is — listTransactions has no pagination and
-// returns the whole history, so the mitigation is client-side.
+// The confirmation that entry worked, newest first, cut into days. Two regions: the few queue
+// entries (pending, committing, failed) rendered directly at the top, and the committed history
+// below, windowed so the DOM stays flat no matter how long the payload is — listTransactions has
+// no pagination and returns the whole history, so the mitigation is client-side.
+//
+// Windowing over TWO heights. Rows are uniform, but a day heading is shorter, so the window can no
+// longer be found by dividing scrollTop by a single row height. Instead every item's top edge is
+// prefix-summed once per list change and the first visible item is found by binary search. That is
+// the whole cost of the headings, and it is paid on the data changing rather than on every scroll.
 
-const ROW_HEIGHT = 72 // px; committed rows are uniform, which is what makes windowing possible.
+const ROW_HEIGHT = 72 // px; committed rows are uniform.
+const DAY_HEIGHT = 36 // px; a day heading.
 const OVERSCAN = 6
+
+function itemHeight(item: DayItem): number {
+  return item.kind === 'day' ? DAY_HEIGHT : ROW_HEIGHT
+}
+
+/** Index of the last item whose top edge is at or above `y`. Offsets ascend, so: binary search. */
+function indexAt(offsets: readonly number[], y: number): number {
+  let low = 0
+  let high = offsets.length - 1
+  while (low < high) {
+    const mid = (low + high + 1) >> 1
+    if (offsets[mid] <= y) low = mid
+    else high = mid - 1
+  }
+  return low
+}
 
 type TransactionListProps = {
   queueEntries: CommitEntry[]
@@ -53,12 +77,27 @@ export function TransactionList({
     return () => observer.disconnect()
   }, [])
 
-  const total = transactions.length
-  const visibleCount = Math.ceil((viewport || 600) / ROW_HEIGHT) + OVERSCAN * 2
-  const start = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN)
-  const end = Math.min(total, start + visibleCount)
-  const window = transactions.slice(start, end)
+  const items = useMemo(() => groupByDay(transactions), [transactions])
 
+  // Top edge of every item, plus a final entry for the total height. Recomputed only when the list
+  // changes, never on scroll.
+  const offsets = useMemo(() => {
+    const acc = new Array<number>(items.length + 1)
+    acc[0] = 0
+    for (let i = 0; i < items.length; i++) acc[i + 1] = acc[i] + itemHeight(items[i])
+    return acc
+  }, [items])
+
+  const totalHeight = offsets[items.length]
+  const start = Math.max(0, indexAt(offsets, scrollTop) - OVERSCAN)
+  const end = Math.min(items.length, indexAt(offsets, scrollTop + (viewport || 600)) + 1 + OVERSCAN)
+  const window = items.slice(start, end)
+
+  // Headings are rendered from the device's own date so "Today" means today where the reader is —
+  // the same wall clock the entry was recorded against (ADR-0018).
+  const today = todayISO()
+
+  const total = transactions.length
   const hasQueue = queueEntries.length > 0
   const nothingYet = !loading && !hasQueue && total === 0
 
@@ -114,18 +153,24 @@ export function TransactionList({
         ref={scrollRef}
         onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
       >
-        <div style={{ height: total * ROW_HEIGHT, position: 'relative' }}>
-          <div style={{ transform: `translateY(${start * ROW_HEIGHT}px)` }}>
-            {window.map((transaction) => (
-              <div key={transaction.id} style={{ height: ROW_HEIGHT }}>
-                <TransactionRow
-                  transaction={transaction}
-                  accountsById={accountsById}
-                  labelsById={labelsById}
-                  onOpen={() => onOpen(transaction.id)}
-                />
-              </div>
-            ))}
+        <div style={{ height: totalHeight, position: 'relative' }}>
+          <div style={{ transform: `translateY(${offsets[start]}px)` }}>
+            {window.map((item) =>
+              item.kind === 'day' ? (
+                <h3 key={item.key} className={styles.day} style={{ height: DAY_HEIGHT }}>
+                  {dayHeading(item.date, today)}
+                </h3>
+              ) : (
+                <div key={item.key} style={{ height: ROW_HEIGHT }}>
+                  <TransactionRow
+                    transaction={item.transaction}
+                    accountsById={accountsById}
+                    labelsById={labelsById}
+                    onOpen={() => onOpen(item.transaction.id)}
+                  />
+                </div>
+              ),
+            )}
           </div>
         </div>
       </div>
