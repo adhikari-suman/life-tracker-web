@@ -25,6 +25,15 @@ vi.mock('../api/generated/sdk.gen', () => ({
   listTransactions: vi.fn().mockResolvedValue({ data: [], response: new Response(null, { status: 200 }) }),
   recordTransaction: vi.fn(),
   createLabel: vi.fn(),
+  // The detail route fetches this from an effect on mount. Absent from the mock it threw an
+  // UNHANDLED rejection rather than a test failure: all 241 tests still reported passing while
+  // vitest exited 1, so the suite looked green in every summary and red to anything reading the
+  // exit code. A route in the tree must be mocked even when the assertion is only that it routes.
+  getTransaction: vi.fn().mockResolvedValue({
+    data: undefined,
+    error: undefined,
+    response: new Response(null, { status: 404 }),
+  }),
 }))
 
 const { getMe, listAccounts, login, logout } = await import('../api/generated/sdk.gen')
