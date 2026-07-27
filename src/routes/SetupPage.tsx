@@ -9,7 +9,7 @@ import { AmountInput } from '../money/AmountInput'
 import { ProblemBanner } from '../components/ProblemBanner'
 import { TextField } from '../components/TextField'
 import { SETUP_PLAN, findExisting } from '../ledger/setupPlan'
-import { todayISO } from '../ledger/todayISO'
+import { nowHHmm, todayISO } from '../ledger/clock'
 import styles from './SetupPage.module.css'
 
 // First run, on an empty Book. Fast entry is impossible without accounts, so this cannot be the
@@ -92,6 +92,10 @@ export function SetupPage() {
           const { error, response, data } = await recordTransaction({
             body: {
               date: todayISO(),
+              // An opening balance occurs "the day it enters the ledger" (CONTEXT.md) — which is
+              // now. The money never moved, so there is no earlier wall clock to be faithful to
+              // and no reason to invent a sentinel: this reading is the true one.
+              time: nowHHmm(),
               from: equity.id,
               to: asset.id,
               amount: toMoney(openingBalance, currency),

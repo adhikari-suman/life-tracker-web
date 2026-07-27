@@ -1,0 +1,83 @@
+# This repo cannot be built alone, and that is deliberate rather than an oversight.
+#
+# openapi-ts.config.ts reads `../life-tracker-contracts/openapi.yaml` — the spec is the single
+# source of truth for every request and response type, the generated client is git-ignored, and
+# nothing here is hand-written. So CI reproduces the sibling checkout the workspace has locally:
+#
+#   $GITHUB_WORKSPACE/
+#     life-tracker-web/         <- this repo
+#     life-tracker-contracts/   <- the spec, checked out beside it
+#
+# The contracts ref follows the BASE branch, not the head. A PR into dev builds against the spec
+# already on dev, so a change that needs a new field fails here until the contracts PR merges
+# first. That is the contract rule enforced by CI rather than by memory.
+name: ci
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: typecheck, lint, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: life-tracker-web
+
+      - uses: actions/checkout@v4
+        with:
+          repository: adhikari-suman/life-tracker-contracts
+          ref: ${{ github.base_ref || github.ref_name }}
+          path: life-tracker-contracts
+
+      # Through env rather than interpolated straight into the script: a ${{ }} expansion inside a
+      # run block is substituted as raw text before bash sees it, and a git ref may legally contain
+      # $ ( ) & | < > and quotes. Restricted triggers make it safe here; passing it as an
+      # environment variable makes it safe regardless.
+      - name: which spec are we building against
+        working-directory: life-tracker-contracts
+        env:
+          SPEC_REF: ${{ github.base_ref || github.ref_name }}
+        run: |
+          echo "ref:     $SPEC_REF"
+          echo "commit:  $(git rev-parse --short HEAD)"
+          echo "version: $(grep -m1 '^  version:' openapi.yaml | awk '{print $2}')"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: life-tracker-web/.nvmrc
+          cache: npm
+          cache-dependency-path: life-tracker-web/package-lock.json
+
+      # --ignore-scripts: a dependency's postinstall runs with the job's token and network, so it
+      # is the cheapest supply-chain foothold there is. Nothing here needs one — verified by
+      # installing this way and building clean.
+      - name: install
+        working-directory: life-tracker-web
+        run: npm ci --ignore-scripts
+
+      # Runs codegen first (via the script), so this fails the moment the hand-written code stops
+      # matching the generated types — which is exactly how the ADR-0018 drift showed up: ten
+      # errors, none of them in anything a human had edited that day.
+      - name: typecheck
+        working-directory: life-tracker-web
+        run: npm run typecheck
+
+      - name: lint
+        working-directory: life-tracker-web
+        run: npm run lint
+
+      - name: test
+        working-directory: life-tracker-web
+        run: npm run test
+
+      - name: build
+        working-directory: life-tracker-web
+        run: npm run build

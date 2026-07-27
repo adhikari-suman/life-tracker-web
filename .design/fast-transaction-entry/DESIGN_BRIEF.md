@@ -104,7 +104,7 @@ The binding constraints come from elsewhere, and they are hard:
 | `AccountPicker` | New | Filtered by kind according to intent. Shows each account's currency, since that drives the cross-currency path. |
 | `LabelPicker` | New | Flat fetch, client-side filter (spec says there is deliberately no search endpoint), ≤3-level tree. **Hidden entirely when the intent has no Income/Expense leg.** |
 | `SecondAmountField` | New | `toAmount`. Appears only when the two chosen accounts differ in currency. |
-| `DateField` | New | Defaults to today. Calendar date only — a timestamp is metadata per ADR-0003. |
+| `WhenField` | New | Occurred At. Date defaults to today; a wall-clock time sits beside it, hidden while the date *is* today and revealed prefilled the moment it is backdated (ADR-0018 supersedes ADR-0003 here — the time is required on the wire, not deferred metadata). |
 | `UndoToast` | New | Holds the commit, counts down, cancels. The safety mechanism for principle 2. |
 | `TransactionList` | New | Newest-first confirmation that entry worked. Read-only. |
 | `EmptyBookOnboarding` | New | First-run account creation. Unavoidable — see Key Interactions. |

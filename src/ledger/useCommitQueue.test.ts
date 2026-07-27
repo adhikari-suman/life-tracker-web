@@ -8,13 +8,17 @@ const { recordTransaction } = await import('../api/generated/sdk.gen')
 
 const REQUEST: RecordTransactionRequest = {
   date: '2026-07-24',
+  time: '19:42',
   from: 'bank',
   to: 'food',
   amount: { amount: '12.00', currency: 'USD' },
 }
 
 function ok() {
-  return { data: { id: 'srv-1', date: REQUEST.date, postings: [] }, response: new Response(null, { status: 201 }) }
+  return {
+    data: { id: 'srv-1', date: REQUEST.date, time: REQUEST.time, postings: [] },
+    response: new Response(null, { status: 201 }),
+  }
 }
 
 beforeEach(() => {
